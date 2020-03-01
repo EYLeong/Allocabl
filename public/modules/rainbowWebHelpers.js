@@ -9,14 +9,11 @@ const connectGuest = async (rainbowSDK, guestToken, agentID) => {
     let account = await rainbowSDK.connection.signinSandBoxWithToken(
         guestToken
     );
-    console.log(account);
     let contact = await rainbowSDK.contacts.searchById(agentID);
-    console.log(contact);
     if (contact) {
         let conversation = await rainbowSDK.conversations.openConversationForContact(
             contact
         );
-        console.log(conversation);
         rainbowSDK.im.sendMessageToConversation(conversation, "Test");
         return conversation;
     } else {

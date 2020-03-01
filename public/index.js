@@ -51,7 +51,7 @@ $(function() {
     document.getElementById("loginBtn").onclick = () => {
         $.get("/guestLogin", (data, status) => {
             connectGuest(rainbowSDK, data, "5e440358e9f1273063695865")
-                .then(conversation => console.log(convsersation))
+                .then(conversation => console.log(conversation))
                 .catch(err => console.log(err));
         }).fail(err => {
             console.log(err);
