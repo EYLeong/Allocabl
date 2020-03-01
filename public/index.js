@@ -1,4 +1,7 @@
-import { connectGuest } from "./modules/rainbowWebHelpers.js";
+import {
+    connectGuest,
+    onNewMessageReceived
+} from "./modules/rainbowWebHelpers.js";
 
 /* Wait for the page to load */
 $(function() {
@@ -45,16 +48,23 @@ $(function() {
     /* Listen to the SDK event RAINBOW_ONLOADED */
     document.addEventListener(rainbowSDK.RAINBOW_ONLOADED, onLoaded);
 
-    /* Load the SDK */
-    rainbowSDK.load();
-
     document.getElementById("loginBtn").onclick = () => {
         $.get("/guestLogin", (data, status) => {
             connectGuest(rainbowSDK, data, "5e440358e9f1273063695865")
-                .then(conversation => console.log(conversation))
+                .then(conversation => {
+                    console.log(conversation);
+                })
                 .catch(err => console.log(err));
         }).fail(err => {
             console.log(err);
         });
     };
+
+    document.addEventListener(
+        rainbowSDK.im.RAINBOW_ONNEWIMMESSAGERECEIVED,
+        onNewMessageReceived
+    );
+
+    /* Load the SDK */
+    rainbowSDK.load();
 });

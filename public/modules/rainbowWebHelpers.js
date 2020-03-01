@@ -21,4 +21,8 @@ const connectGuest = async (rainbowSDK, guestToken, agentID) => {
     }
 };
 
-export { connectGuest };
+const onNewMessageReceived = event => {
+    console.log(event.detail.message.data);
+}
+
+export { connectGuest, onNewMessageReceived };
