@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>BotUI - Hello World</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/botui/build/botui.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/botui/build/botui-theme-default.css" />
+  </head>
+  <body>
+    <div class="botui-app-container" id="hello-world">
+      <bot-ui></bot-ui>
+    </div>
+    <script src="https://cdn.jsdelivr.net/vue/latest/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/botui/build/botui.js"></script>
+    <script>
+    var botui = new BotUI('hello-world');
+
+    botui.message.add({ // show a message
+        //human: true,
+        content: 'Hi there! Would you like to talk to an agent?'
+    }).then(function () { // wait till its shown
+        return botui.action.button({ // show 'text' action
+            action: [{ 
+            text: 'Yes!',
+            value: 'yes'
+            },{
+            text: 'No thanks',
+            value: 'no'
+            }]
+    })
+    }).then(function (res) { // get the result
+        if (res.value == 'yes'){
+            botui.message.add({
+            delay: 500,
+            content: 'Department?'
+            }).then(function (){
+            botui.action.button({
+                delay: 300,
+                action: [{ 
+                text: 'One',
+                value: 'one'
+                },{
+                text: 'Two',
+                value: 'Two'
+                }]
+            })
+            }).then(function (res2) { // will be called when a button is clicked.
+                botui.message.add({
+                    content: res2.value,
+                    delay: 500
+                })
+            }) 
+        }
+        
+        else{
+            botui.message.add({
+            delay: 500,
+            content: 'bye'
+            })
+        }
+    });
+    
+
+    
+
+    </script>
+  </body>
+</html>
