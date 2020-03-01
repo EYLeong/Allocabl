@@ -1,3 +1,4 @@
+const rainbowHelpers = require("./helpers/rainbowHelpers");
 const express = require("express");
 const app = express();
 const port = 3000;
@@ -8,22 +9,10 @@ app.listen(port, () => console.log(`App listening on port ${port}!`));
 
 app.get("/guestLogin", (req, res) => {
     if (rainbowReady) {
-        rainbowSDK.admin
-            .createAnonymousGuestUser()
-            .then(user => {
-                rainbowSDK.admin
-                    .askTokenOnBehalf(user.loginEmail, user.password)
-                    .then(json => {
-                        console.log(json);
-                        res.send(json.token);
-                    })
-                    .catch(err => {
-                        console.log(err);
-                    });
-            })
-            .catch(err => {
-                console.log(err);
-            });
+        rainbowHelpers
+            .getGuestToken(rainbowSDK)
+            .then(token => res.send(token))
+            .catch(err => console.log(err));
     } else {
         res.status(400).send("server not ready");
     }
@@ -73,4 +62,9 @@ rainbowSDK.start();
 rainbowSDK.events.on("rainbow_onready", () => {
     console.log("RAINBOW IS READY");
     rainbowReady = true;
+});
+
+rainbowSDK.events.on("rainbow_onstopped", () => {
+    console.log("RAINBOW STOPPED");
+    rainbowReady = false;
 });

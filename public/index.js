@@ -1,3 +1,5 @@
+import { connectGuest } from "./modules/rainbowWebHelpers.js";
+
 /* Wait for the page to load */
 $(function() {
     console.log("[DEMO] :: Rainbow Application started!");
@@ -47,64 +49,12 @@ $(function() {
     rainbowSDK.load();
 
     document.getElementById("loginBtn").onclick = () => {
-        document.getElementById("status").innerHTML =
-            "Waiting for server response";
         $.get("/guestLogin", (data, status) => {
-            console.log(data, status);
-            document.getElementById("status").innerHTML =
-                "Guest login token received - Logging in";
-            rainbowSDK.connection
-                .signinSandBoxWithToken(data)
-                .then(account => {
-                    console.log(account);
-                    document.getElementById("status").innerHTML =
-                        "Connected, getting agent contact";
-                    rainbowSDK.contacts
-                        .searchById("5e440358e9f1273063695865")
-                        .then(contact => {
-                            console.log(contact);
-                            if (contact) {
-                                document.getElementById("status").innerHTML =
-                                    "Agent contact received, creating conversation";
-                                rainbowSDK.conversations
-                                    .openConversationForContact(contact)
-                                    .then(conversation => {
-                                        console.log(conversation);
-                                        document.getElementById(
-                                            "status"
-                                        ).innerHTML =
-                                            "Conversation created, sending test message";
-                                        rainbowSDK.im.sendMessageToConversation(
-                                            conversation,
-                                            "Test"
-                                        );
-                                    })
-                                    .catch(err => {
-                                        console.log(err);
-                                        document.getElementById(
-                                            "status"
-                                        ).innerHTML =
-                                            "Conversation creation error";
-                                    });
-                            } else {
-                                document.getElementById("status").innerHTML =
-                                    "Null contact received";
-                            }
-                        })
-                        .catch(err => {
-                            console.log(err);
-                            document.getElementById("status").innerHTML =
-                                "Retrieve contact error";
-                        });
-                })
-                .catch(err => {
-                    console.log(err);
-                    document.getElementById("status").innerHTML =
-                        "Sign in error";
-                });
+            connectGuest(rainbowSDK, data, "5e440358e9f1273063695865")
+                .then(conversation => console.log(convsersation))
+                .catch(err => console.log(err));
         }).fail(err => {
             console.log(err);
-            document.getElementById("status").innerHTML = err.responseText;
         });
     };
 });
