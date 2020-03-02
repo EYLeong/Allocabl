@@ -23,6 +23,6 @@ const connectGuest = async (rainbowSDK, guestToken, agentID) => {
 
 const onNewMessageReceived = event => {
     console.log(event.detail.message.data);
-}
+};
 
 export { connectGuest, onNewMessageReceived };
