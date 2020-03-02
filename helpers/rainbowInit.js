@@ -20,7 +20,7 @@ let options = {
     },
     // Logs options
     logs: {
-        enableConsoleLogs: true,
+        enableConsoleLogs: false,
         enableFileLogs: false,
         file: {
             path: "/var/tmp/rainbowsdk/",
@@ -49,17 +49,10 @@ rainbowSDK.events.on("rainbow_onstopped", () => {
     rainbowReady = false;
 });
 
-
-/**
- * @returns {boolean} Returns whether rainbowSDK is ready
- */
 const getRainbowReady = () => {
     return rainbowReady;
 };
 
-/**
- * @returns {*} Returns the rainbowSDK variable
- */
 const getRainbowSDK = () => {
     return rainbowSDK;
 };

@@ -1,10 +1,3 @@
-/**
- * @description Async function that connects guest to target agent and sends a test message
- * @return {*} conversation object between guest and target agent
- * @param {*} rainbowSDK Initialized rainbowSDK variable
- * @param {string} guestToken Token for guest account
- * @param {string} agentID ID for target agent
- */
 const connectGuest = async (rainbowSDK, guestToken, agentID) => {
     let account = await rainbowSDK.connection.signinSandBoxWithToken(
         guestToken

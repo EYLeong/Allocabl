@@ -49,15 +49,23 @@ $(function() {
     document.addEventListener(rainbowSDK.RAINBOW_ONLOADED, onLoaded);
 
     document.getElementById("loginBtn").onclick = () => {
-        $.get("/guestLogin", (data, status) => {
-            connectGuest(rainbowSDK, data, "5e440358e9f1273063695865")
-                .then(conversation => {
-                    console.log(conversation);
-                })
-                .catch(err => console.log(err));
-        }).fail(err => {
-            console.log(err);
+        $.ajax({
+            type: "post",
+            url: "/database/getAgent",
+            contentType: "application/json",
+            data: JSON.stringify({ department: "sales" }),
+            error: err => console.log(err),
+            success: data => console.log(data)
         });
+        // $.get("/rainbow/createGuest", (data, status) => {
+        //     connectGuest(rainbowSDK, data, "5e440358e9f1273063695865")
+        //         .then(conversation => {
+        //             console.log(conversation);
+        //         })
+        //         .catch(err => console.log(err));
+        // }).fail(err => {
+        //     console.log(err);
+        // });
     };
 
     document.addEventListener(
