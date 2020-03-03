@@ -1,14 +1,7 @@
 const mysql = require("mysql");
 
-let connection = mysql.createConnection({
-    host: "localhost",
-    user: "allocabl",
-    password: "Password123",
-    database: "allocabl"
-});
-
-const restartConnection = () => {
-    connection = mysql.createConnection({
+const createConnection = () => {
+    return mysql.createConnection({
         host: "localhost",
         user: "allocabl",
         password: "Password123",
@@ -17,12 +10,11 @@ const restartConnection = () => {
 };
 
 const getAgent = (department, callback, errorHandler) => {
-    connection.query(
+    createConnection().query(
         `SELECT id FROM agents WHERE available = 1 AND department = '${department}'`,
         (err, rows) => {
             if (err) {
                 errorHandler(err);
-                restartConnection();
             } else callback(rows[0].id);
         }
     );
