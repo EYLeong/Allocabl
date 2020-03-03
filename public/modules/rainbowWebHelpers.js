@@ -1,7 +1,27 @@
-const connectGuest = async (rainbowSDK, guestToken, agentID) => {
+const connectGuest = async (rainbowSDK, guestToken, agentPref) => {
     let account = await rainbowSDK.connection.signinSandBoxWithToken(
         guestToken
     );
+
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            type: "post",
+            url: "/database/getAgent",
+            contentType: "application/json",
+            data: JSON.stringify(agentPref),
+            error: err => reject(err),
+            success: data => {
+                try {
+                    resolve(connectToAgent(rainbowSDK, data));
+                } catch (err) {
+                    reject(err);
+                }
+            }
+        });
+    });
+};
+
+const connectToAgent = async (rainbowSDK, agentID) => {
     let contact = await rainbowSDK.contacts.searchById(agentID);
     if (contact) {
         let conversation = await rainbowSDK.conversations.openConversationForContact(

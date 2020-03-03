@@ -1,4 +1,4 @@
-const {getRainbowReady, getRainbowSDK} = require("../helpers/rainbowInit");
+const { getRainbowReady, getRainbowSDK } = require("../helpers/rainbowInit");
 
 const createGuestAccount = async (req, res) => {
     if (getRainbowReady()) {
@@ -12,6 +12,7 @@ const createGuestAccount = async (req, res) => {
             res.send(json.token);
         } catch (err) {
             console.log(err);
+            res.status(400).send("rainbowSDK error");
         }
     } else {
         res.status(400).send("server not ready");

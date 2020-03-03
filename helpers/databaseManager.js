@@ -16,13 +16,12 @@ const restartConnection = () => {
     });
 };
 
-const getAgent = (department, callback) => {
+const getAgent = (department, callback, errorHandler) => {
     connection.query(
         `SELECT id FROM agents WHERE available = 1 AND department = '${department}'`,
         (err, rows) => {
             if (err) {
-                console.log(err);
-                callback("ERROR");
+                errorHandler(err);
                 restartConnection();
             } else callback(rows[0].id);
         }

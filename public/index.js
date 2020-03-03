@@ -27,7 +27,7 @@ $(function() {
         console.log("[DEMO] :: On SDK Loaded !");
 
         // Activate full SDK log
-        rainbowSDK.setVerboseLog(true);
+        rainbowSDK.setVerboseLog(false);
 
         rainbowSDK
             .initialize(applicationID, applicationSecret)
@@ -49,23 +49,15 @@ $(function() {
     document.addEventListener(rainbowSDK.RAINBOW_ONLOADED, onLoaded);
 
     document.getElementById("loginBtn").onclick = () => {
-        $.ajax({
-            type: "post",
-            url: "/database/getAgent",
-            contentType: "application/json",
-            data: JSON.stringify({ department: "sales" }),
-            error: err => console.log(err),
-            success: data => console.log(data)
+        $.get("/rainbow/createGuest", (data, status) => {
+            connectGuest(rainbowSDK, data, { department: "sales" })
+                .then(conversation => {
+                    console.log(conversation);
+                })
+                .catch(err => console.error(err));
+        }).fail(err => {
+            console.error(err);
         });
-        // $.get("/rainbow/createGuest", (data, status) => {
-        //     connectGuest(rainbowSDK, data, "5e440358e9f1273063695865")
-        //         .then(conversation => {
-        //             console.log(conversation);
-        //         })
-        //         .catch(err => console.log(err));
-        // }).fail(err => {
-        //     console.log(err);
-        // });
     };
 
     document.addEventListener(
