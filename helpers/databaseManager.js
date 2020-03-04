@@ -2,12 +2,26 @@ const mysql = require("mysql");
 
 const createConnection = () => {
     return mysql.createConnection({
-        host: "10.12.49.149",
-        user: "lingy",
+        host: "localhost",
+        user: "root",
         password: "Password123",
-        database: "allocabl"
+        database: "sys"
     });
 };
+
+function checkAgentAvailability(department) {
+    return new Promise(function(resolve, reject) {
+    createConnection().query(
+        `SELECT id FROM agents WHERE available = 1 AND department = '${department}' ORDER BY customersServed`,
+        function(err, rows) {
+            if (err) {
+                return reject(err);
+            } 
+            resolve(rows);
+        }
+    );
+    });
+}
 
 const getAgent = (department, callback, errorHandler) => {
     createConnection().query(
@@ -16,8 +30,7 @@ const getAgent = (department, callback, errorHandler) => {
             if (err) {
                 errorHandler(err);
             } else {
-                if (rows.length == 0) errorHandler(new Error("No Agent Available"));
-                else callback(rows[0].id);
+                callback(rows[0].id);
             }
         }
     );
@@ -46,6 +59,7 @@ const toggleAgentAvailability = (agentID, errorHandler, callback) => {
 };
 
 module.exports = {
+    checkAgentAvailability,
     getAgent,
     incrementCustomersServed,
     toggleAgentAvailability
