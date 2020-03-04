@@ -11,13 +11,42 @@ const createConnection = () => {
 
 const getAgent = (department, callback, errorHandler) => {
     createConnection().query(
-        `SELECT id FROM agents WHERE available = 1 AND department = '${department}'`,
+        `SELECT id FROM agents WHERE available = 1 AND department = '${department}' ORDER BY customersServed`,
         (err, rows) => {
             if (err) {
                 errorHandler(err);
-            } else callback(rows[0].id);
+            } else {
+                if (rows.length == 0) errorHandler(new Error("No Agent Available"));
+                else callback(rows[0].id);
+            }
         }
     );
 };
 
-module.exports = { getAgent };
+const incrementCustomersServed = (agentID, errorHandler, callback) => {
+    createConnection().query(
+        `UPDATE agents SET customersServed = customersServed + 1 WHERE id = '${agentID}'`,
+        (err, result) => {
+            if (err) {
+                errorHandler(err);
+            } else callback(result);
+        }
+    );
+};
+
+const toggleAgentAvailability = (agentID, errorHandler, callback) => {
+    createConnection().query(
+        `UPDATE agents SET available = NOT available WHERE id = '${agentID}'`,
+        (err, result) => {
+            if (err) {
+                errorHandler(err);
+            } else callback(result);
+        }
+    );
+};
+
+module.exports = {
+    getAgent,
+    incrementCustomersServed,
+    toggleAgentAvailability
+};

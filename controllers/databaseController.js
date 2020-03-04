@@ -1,4 +1,8 @@
-const { getAgent } = require("../helpers/databaseManager");
+const {
+    getAgent,
+    toggleAgentAvailability,
+    incrementCustomersServed
+} = require("../helpers/databaseManager");
 
 const getAgentID = (req, res) => {
     getAgent(
@@ -6,6 +10,16 @@ const getAgentID = (req, res) => {
         agentID => {
             console.log(agentID);
             res.send(agentID);
+            toggleAgentAvailability(
+                agentID,
+                err => console.log(err),
+                result => console.log(result)
+            );
+            incrementCustomersServed(
+                agentID,
+                err => console.log(err),
+                result => console.log(result)
+            );
         },
         err => {
             console.log(err);
