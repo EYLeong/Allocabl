@@ -4,7 +4,8 @@
         <meta charset="utf-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>My First Rainbow Application</title>
+        <title>Allocabl</title>
+        <!-- RainbowSDK -->
         <script src="//cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.9/es5-shim.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/es6-promise/4.0.5/es6-promise.min.js"></script>
         <script src="//code.jquery.com/jquery-2.1.3.min.js"></script>
@@ -12,12 +13,21 @@
         <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.5/angular.min.js"></script>
         <script src="./vendors-sdk.min.js"></script>
         <script src="./rainbow-sdk.min.js"></script>
+        <!-- BotUI -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/botui/build/botui.min.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/botui/build/botui-theme-default.css" />
+        <script src="https://cdn.jsdelivr.net/vue/latest/vue.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/botui/build/botui.js"></script>
+        <!-- Allocabl -->
         <script src="/socket.io/socket.io.js"></script>
         <script type="module" src="./index.js"></script>
     </head>
     <body>
-        <button id="connect">Chat with agent</button>
+        <div class="botui-app-container" id="allocablPrompt">
+            <bot-ui></bot-ui>
+        </div>
+        <!-- <button id="connect">Chat with agent</button>
         <button id="disconnect">Disconnect</button>
-        <button id="loginGuest" , disabled>Log in as Guest</button>
+        <button id="loginGuest" , disabled>Log in as Guest</button> -->
     </body>
 </html>

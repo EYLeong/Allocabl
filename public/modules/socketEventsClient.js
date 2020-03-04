@@ -2,7 +2,7 @@ const customError = msg => {
     console.error(msg);
 };
 
-const loginInfo = async (rainbowSDK, info) => {
+const loginInfo = async (rainbowSDK, info, successCallback) => {
     let account = await rainbowSDK.connection.signinSandBoxWithToken(
         info.token
     );
@@ -12,7 +12,7 @@ const loginInfo = async (rainbowSDK, info) => {
             contact
         );
         rainbowSDK.im.sendMessageToConversation(conversation, "Test");
-        console.log(conversation);
+        successCallback(conversation);
     } else {
         console.error("null contact");
     }
