@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>My First Rainbow Application</title>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.9/es5-shim.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/es6-promise/4.0.5/es6-promise.min.js"></script>
+        <script src="//code.jquery.com/jquery-2.1.3.min.js"></script>
+        <script src="//cdn.jsdelivr.net/momentjs/2.15.1/moment-with-locales.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.5/angular.min.js"></script>
+        <script src="./vendors-sdk.min.js"></script>
+        <script src="./rainbow-sdk.min.js"></script>
+
+
+        <script type="text/javascript" src="/Users/varsha/Desktop/Allocabl/Allocabl/public/index.js"></script>
+
+        <title>BotUI - Hello World</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/botui/build/botui.min.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/botui/build/botui-theme-default.css" />
+
+    </head>
+    <body>
+
+        <div class="botui-app-container" id="hello-world">
+            <bot-ui></bot-ui>
+          </div>
+          <script src="https://cdn.jsdelivr.net/vue/latest/vue.min.js"></script>
+          <script src="https://cdn.jsdelivr.net/npm/botui/build/botui.js"></script>
+
+        <p id="status">Not logged in</p>
+        <button id="loginBtn", disabled>Log In Guest</button>
+
+        <script>
+            var botui = new BotUI('hello-world');
+        
+            botui.message.add({ // show a message
+                //human: true,
+                content: 'Hi there! Would you like to talk to an agent?'
+            }).then(function () { // wait till its shown
+                return botui.action.button({ // show 'text' action
+                    action: [{ 
+                    text: 'Yes!',
+                    value: 'yes'
+                    },{
+                    text: 'No thanks',
+                    value: 'no'
+                    }]
+            })
+            }).then(function (res) { // get the result
+                if (res.value == 'yes'){
+                    yesAnswer();
+                }
+                
+                else{
+                    botui.message.add({
+                    delay: 500,
+                    content: 'K'
+                    })
+                }
+            });
+
+            var yesAnswer = function () {
+                botui.message.add({
+                delay: 500,
+                content: 'Department?'
+                }).then(response = function(){
+                botui.action.button({
+                    delay: 300,
+                    action: [{ 
+                    text: 'IT',
+                    value: 'IT'
+                    },{
+                    text: 'Finance',
+                    value: 'finance'
+                    },{
+                    text: 'General',
+                    value: 'general'
+                    }]
+                    }).then(function(res){
+                        departmentChosen(res.value);
+                        }
+                    )
+                })
+                return res.value;
+            };
+
+            var departmentChosen = function(dept){
+                if (dept == 'IT'){
+                    botui.message.add({ // show a message
+                    delay: 300,
+                    content: 'Connecting you to an IT agent...' ,
+                    })
+                }
+                else if (dept == 'finance'){
+                    botui.message.add({ // show a message
+                    delay: 300,
+                    content: 'Connecting you to a finance agent...' 
+                    });
+                }
+                else if (dept == 'general'){
+                    botui.message.add({ // show a message
+                    delay: 300,
+                    content: 'Connecting you to a general agent...' 
+                    })
+                }
+
+            }
+
+            </script>
+        
+    </body>
+</html>
+            
