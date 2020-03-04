@@ -1,7 +1,6 @@
-import {
-    connectGuest,
-    onNewMessageReceived
-} from "./modules/rainbowWebHelpers.js";
+import { onNewMessageReceived } from "./modules/rainbowWebHelpers.js";
+
+import { customError, loginInfo } from "./modules/socketEventsClient.js";
 
 /* Wait for the page to load */
 $(function() {
@@ -19,7 +18,7 @@ $(function() {
         console.log("[DEMO] :: On SDK Ready!");
         // do something when the SDK is ready
 
-        document.getElementById("loginBtn").disabled = false;
+        document.getElementById("loginGuest").disabled = false;
     };
 
     /* Callback for handling the event 'RAINBOW_ONCONNECTIONSTATECHANGED' */
@@ -48,23 +47,27 @@ $(function() {
     /* Listen to the SDK event RAINBOW_ONLOADED */
     document.addEventListener(rainbowSDK.RAINBOW_ONLOADED, onLoaded);
 
-    document.getElementById("loginBtn").onclick = () => {
-        $.get("/rainbow/createGuest", (data, status) => {
-            connectGuest(rainbowSDK, data, { department: "sales" })
-                .then(conversation => {
-                    console.log(conversation);
-                })
-                .catch(err => console.error(err));
-        }).fail(err => {
-            console.error(err);
-        });
-    };
-
     document.addEventListener(
         rainbowSDK.im.RAINBOW_ONNEWIMMESSAGERECEIVED,
         onNewMessageReceived
     );
 
+    document.getElementById("connect").onclick = () => {
+        socket.connect();
+        socket.on("customError", customError);
+        socket.on("loginInfo", info => loginInfo(rainbowSDK, info));
+    };
+
+    document.getElementById("disconnect").onclick = () => {
+        socket.disconnect();
+    };
+
+    document.getElementById("loginGuest").onclick = () => {
+        socket.emit("loginGuest", 'sales');
+    };
+
     /* Load the SDK */
     rainbowSDK.load();
+
+    const socket = io({ autoConnect: false });
 });

@@ -1,14 +1,19 @@
 const express = require("express");
 const app = express();
 const port = 3000;
+const http = require("http").createServer(app);
+const io = require("socket.io")(http);
 
-const rainbowRouter = require("./routes/rainbow");
-const databaseRouter = require("./routes/database");
+const socketEvents = require("./helpers/socketEvents");
 
 app.use(express.static("public"));
-app.use(express.json());
 
-app.listen(port, () => console.log(`App listening on port ${port}!`));
+http.listen(port, () => console.log(`App listening on port ${port}!`));
 
-app.use("/rainbow", rainbowRouter);
-app.use("/database", databaseRouter);
+io.on("connection", socket => {
+    console.log(`a user with socket id ${socket.id} connected`);
+    socket.on("disconnect", () => socketEvents.disconnect(socket));
+    socket.on("loginGuest", department =>
+        socketEvents.loginGuest(socket, department)
+    );
+});
