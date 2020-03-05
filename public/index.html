@@ -12,11 +12,97 @@
         <script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.7.5/angular.min.js"></script>
         <script src="./vendors-sdk.min.js"></script>
         <script src="./rainbow-sdk.min.js"></script>
+        <script type="text/javascript" src="./index.js"></script>
 
-        <script src="./index.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/botui/build/botui.min.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/botui/build/botui-theme-default.css" />
+
     </head>
     <body>
+        <div>
         <p id="status">Not logged in</p>
         <button id="loginBtn", disabled>Log In Guest</button>
+        </div>
+        <div>
+        <h>who do you want to chat with?</h>
+        <form>
+            <ul>
+                <button id="btn_IT" onclick="onClickIT">IT Department</button>
+                <button id="btn_Finance" onclick="onClickFinance">Finance Department</button>
+                <button id="btn_General" onclick="onClickGeneral">General Department</button>
+            </ul>
+        </form>
+        </div>
+        
+        <div class="botui-app-container" id="hello-world">
+            <bot-ui></bot-ui>
+        </div>
+        <script src="https://cdn.jsdelivr.net/vue/latest/vue.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/botui/build/botui.js"></script>
+        <script>
+            var botui = new BotUI('hello-world');
+        
+            botui.message.add({ // show a message
+                //human: true,
+                content: 'Hi there! Would you like to talk to an agent?'
+            }).then(function () { // wait till its shown
+                return botui.action.button({ // show 'text' action
+                    action: [{ 
+                    text: 'Yes!',
+                    value: 'yes'
+                    },{
+                    text: 'No thanks',
+                    value: 'no'
+                    }]
+                })
+            }).then(function (res) { // get the result
+                if (res.value == 'yes'){
+                    botui.message.add({
+                    delay: 500,
+                    content: 'Department?'
+                    }).then(response = function(){
+                    botui.action.button({
+                        delay: 300,
+                        action: [{ 
+                        text: 'IT',
+                        value: 'IT',
+                        },{
+                        text: 'Finance',
+                        value: 'finance'
+                        },{
+                        text: 'General',
+                        value: 'general'
+                        }]
+                    }).then(function(res){
+                        if(res.value == 'IT'){
+                        botui.message.add({
+                        delay: 500,
+                        content: 'Load1'})
+                        console.log("Test");
+                        
+
+                        }else if(res.value == 'finance'){
+                        botui.message.add({
+                        delay: 500,
+                        content: 'Load2'})
+                        .then()
+
+                        }else if(res.value == 'general'){
+                        botui.message.add({
+                        delay: 500,
+                        content: 'Load3'})
+                        .then()
+
+                        }
+                    })
+                })
+            }else{
+                    botui.message.add({
+                    delay: 500,
+                    content: 'bye'
+                    })
+                }
+            });
+        </script>
     </body>
 </html>

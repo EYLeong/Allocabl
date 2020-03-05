@@ -34,20 +34,27 @@ let rainbowReady = false;
 // Load the SDK
 let RainbowSDK = require("rainbow-node-sdk");
 
+//all my Users IDs
+
+/* 
+    test1@company.com abcD1234! 5e427e8de9f1273063695350
+    test2@company.com abcD1234! 5e5bf1116c332176648fdf29
+    test3@company.com abcD1234! 5e5bf12c6c332176648fdf31
+*/
 // Define your configuration
 let options = {
     rainbow: {
         host: "sandbox"
     },
     credentials: {
-        login: "leo.en.gms@gmail.com", // To replace by your developer credendials
-        password: "7q?2OfHDGx[9" // To replace by your developer credentials
+        login: "tscd.1996@gmail.com", // To replace by your developer credendials
+        password: "y[x{2K5[Sd*6" // To replace by your developer credentials
     },
     // Application identifier
     application: {
-        appID: "b61d1e604d9c11ea819a43cb4a9dae9b",
+        appID: "6eb85d004cb111ea819a43cb4a9dae9b",
         appSecret:
-            "t9EcSl9Df3qUGJBhdVMhS9UVavSwd6mttfT2hHW8A1310V6b6gy7FOzav3gWcpUC"
+            "37GVusdx55LrIcQZHs68Uh1CYOf1LdDl68zazTZaZn8InoIek8rPFyzqAAnO4s52"
     },
     // Logs options
     logs: {
