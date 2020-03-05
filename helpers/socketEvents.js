@@ -3,8 +3,14 @@ const databaseManager = require("../helpers/databaseManager");
 
 const disconnect = async socket => {
     console.log(`a user with socket id ${socket.id} disconnected`);
-    let result = await databaseManager.removeSocketAgent(socket.id);
-    console.log(result);
+    try {
+        let result = await databaseManager.removeSocketAgent(socket.id);
+        console.log(
+            `customerSocket ${socket.id} removed successfully from database`
+        );
+    } catch (err) {
+        console.log(err);
+    }
 };
 
 const loginGuest = async (socket, department) => {
@@ -15,7 +21,6 @@ const loginGuest = async (socket, department) => {
                 let result = await databaseManager.toggleAgentAvailability(
                     rows[0].id
                 );
-                console.log(result);
                 result = await databaseManager.incrementCustomersServed(
                     rows[0].id
                 );
@@ -23,7 +28,7 @@ const loginGuest = async (socket, department) => {
                     rows[0].id,
                     socket.id
                 );
-                console.log(result);
+                console.log(`AgentID ${rows[0].id} retrieved from database and assigned`);
                 try {
                     let user = await rainbowInit
                         .getRainbowSDK()
@@ -31,7 +36,13 @@ const loginGuest = async (socket, department) => {
                     let json = await rainbowInit
                         .getRainbowSDK()
                         .admin.askTokenOnBehalf(user.loginEmail, user.password);
-                    socket.emit("loginInfo", { token: json.token, agentID: rows[0].id });
+                    socket.emit("loginInfo", {
+                        token: json.token,
+                        agentID: rows[0].id
+                    });
+                    console.log(
+                        `AgentID ${rows[0].id} and guest token sent to client`
+                    );
                 } catch (err) {
                     console.log(err);
                     socket.emit("customError", "SDK error");
