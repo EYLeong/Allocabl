@@ -16,7 +16,7 @@ const initialPrompt = async botui => {
             }
         ]
     });
-    if (res.value == "yes") {
+    if (res.value === "yes") {
         return departmentPrompt(botui);
     } else {
         await botui.message.add({
@@ -53,19 +53,19 @@ const departmentPrompt = async botui => {
 };
 
 const departmentChosen = async (botui, dept) => {
-    if (dept == "sales") {
+    if (dept === "sales") {
         await botui.message.add({
             // show a message
             delay: 300,
             content: "Connecting you to a sales agent..."
         });
-    } else if (dept == "finance") {
+    } else if (dept === "finance") {
         await botui.message.add({
             // show a message
             delay: 300,
             content: "Connecting you to a finance agent..."
         });
-    } else if (dept == "general") {
+    } else if (dept === "general") {
         await botui.message.add({
             // show a message
             delay: 300,

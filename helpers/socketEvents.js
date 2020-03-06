@@ -17,7 +17,7 @@ const loginGuest = async (socket, department) => {
     if (rainbowInit.getRainbowReady()) {
         try {
             let rows = await databaseManager.getAgent(department);
-            if (rows.length != 0) {
+            if (rows.length !== 0) {
                 let result = await databaseManager.toggleAgentAvailability(
                     rows[0].id
                 );

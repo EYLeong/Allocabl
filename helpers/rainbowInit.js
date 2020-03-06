@@ -1,4 +1,7 @@
+const databaseManager = require("./databaseManager");
+
 let rainbowReady = false;
+let agentCount = 0;
 
 // Load the SDK
 let RainbowSDK = require("rainbow-node-sdk");
@@ -40,8 +43,7 @@ let rainbowSDK = new RainbowSDK(options);
 rainbowSDK.start();
 
 rainbowSDK.events.on("rainbow_onready", () => {
-    console.log("RAINBOW IS READY");
-    rainbowReady = true;
+    updateAgentStatusAll();
 });
 
 rainbowSDK.events.on("rainbow_onstopped", () => {
@@ -49,12 +51,40 @@ rainbowSDK.events.on("rainbow_onstopped", () => {
     rainbowReady = false;
 });
 
+// "rainbow_oncontactpresencechanged"
+// contact.presence
+
 const getRainbowReady = () => {
     return rainbowReady;
 };
 
 const getRainbowSDK = () => {
     return rainbowSDK;
+};
+
+const updateAgentStatusAll = async () => {
+    let contacts = await rainbowSDK.contacts.getAll();
+    agentCount = contacts.length - 1;
+    for (contact of contacts) {
+        if (!contact.adminType) {
+            updateAgentStatus(contact.id, contact.presence);
+        }
+    }
+};
+
+const updateAgentStatus = async (id, presence) => {
+    if (presence === "online") {
+        await databaseManager.setAgentAvailable(id);
+        console.log(`AgentID ${id} set to available`);
+    } else {
+        await databaseManager.setAgentUnavailable(id);
+        console.log(`AgentID ${id} set to unavailable`);
+    }
+    agentCount -= 1;
+    if (agentCount === 0) {
+        rainbowReady = true;
+        console.log("RAINBOW IS READY");
+    }
 };
 
 module.exports = { getRainbowReady, getRainbowSDK };
