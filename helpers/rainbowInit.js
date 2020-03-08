@@ -56,9 +56,6 @@ rainbowSDK.events.on("rainbow_oncontactpresencechanged", contact => {
     onAgentStatusChange(contact.id, contact.presence);
 });
 
-// "rainbow_oncontactpresencechanged"
-// contact.presence
-
 const getRainbowReady = () => {
     return rainbowReady;
 };
@@ -88,7 +85,7 @@ const initAgentStatus = async (id, presence) => {
     agentCount -= 1;
     if (agentCount === 0) {
         rainbowReady = true;
-        console.log("All agent statuses set");
+        console.log("All agent statuses set, Allocabl is ready");
     }
 };
 
