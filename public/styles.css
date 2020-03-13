@@ -1,0 +1,32 @@
+#support_image {
+    position:absolute;
+    bottom:49px;
+    right:49px;
+    z-index: 2;
+}
+#support_image:hover {
+    transform: scale(1.05);
+}
+
+#support_image:active { 
+    -webkit-transform: rotate(10deg);
+          transform: rotate(10deg);
+}
+
+#allocablPrompt {
+    position: absolute;
+    display: inline-block;
+    border-style: solid;
+    border-radius: 20px;
+    border-color: grey;
+    bottom:50px;
+    right:50px;
+    visibility: hidden;
+    overflow: hidden;
+    z-index: 1;
+}
+#allocablPrompt.show {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s
+}
