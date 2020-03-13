@@ -10,33 +10,27 @@ $(function() {
 
     const socket = io({ autoConnect: false });
 
-    socket.on("loginInfo", info =>
-        loginInfo(rainbowSDK, info, conversation =>
-            connected(botui, res =>
-                rainbowSDK.im.sendMessageToConversation(conversation, res.value)
-            )
-        )
-    );
-    socket.on("customError", msg => {
-        customError(msg);
-        botui.message.add({ content: msg }).then(
-            initialPrompt(botui, dept => {
-                socket.emit("loginGuest", dept);
-            })
+    socket.on("loginInfo", async info => {
+        let conversation = await loginInfo(rainbowSDK, info);
+        connected(botui, res =>
+            rainbowSDK.im.sendMessageToConversation(conversation, res.value)
         );
+    });
+    socket.on("customError", async msg => {
+        customError(msg);
+        await botui.message.add({ content: msg });
+        let dept = await initialPrompt(botui);
+        if (dept) socket.emit("loginGuest", dept);
     });
 
     /* Listen to the SDK event RAINBOW_ONREADY */
-    document.addEventListener(rainbowSDK.RAINBOW_ONREADY, () => {
+    document.addEventListener(rainbowSDK.RAINBOW_ONREADY, async () => {
         console.log("[DEMO] :: On Rainbow Ready!");
-        initialPrompt(
-            botui,
-            dept => {
-                socket.connect();
-                socket.emit("loginGuest", dept);
-            },
-            err => console.log(err)
-        );
+        let dept = await initialPrompt(botui);
+        if (dept) {
+            socket.connect();
+            socket.emit("loginGuest", dept);
+        }
     });
 
     document.addEventListener(

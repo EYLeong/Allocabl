@@ -1,4 +1,7 @@
+const databaseManager = require("./databaseManager");
+
 let rainbowReady = false;
+let agentCount = 0;
 
 // Load the SDK
 let RainbowSDK = require("rainbow-node-sdk");
@@ -41,12 +44,16 @@ rainbowSDK.start();
 
 rainbowSDK.events.on("rainbow_onready", () => {
     console.log("RAINBOW IS READY");
-    rainbowReady = true;
+    initAgentStatusAll();
 });
 
 rainbowSDK.events.on("rainbow_onstopped", () => {
     console.log("RAINBOW STOPPED");
     rainbowReady = false;
+});
+
+rainbowSDK.events.on("rainbow_oncontactpresencechanged", contact => {
+    onAgentStatusChange(contact.id, contact.presence);
 });
 
 const getRainbowReady = () => {
@@ -55,6 +62,41 @@ const getRainbowReady = () => {
 
 const getRainbowSDK = () => {
     return rainbowSDK;
+};
+
+const initAgentStatusAll = async () => {
+    let contacts = await rainbowSDK.contacts.getAll();
+    agentCount = contacts.length - 1;
+    for (contact of contacts) {
+        if (!contact.adminType) {
+            initAgentStatus(contact.id, contact.presence);
+        }
+    }
+};
+
+const initAgentStatus = async (id, presence) => {
+    if (presence === "online") {
+        await databaseManager.setAgentAvailable(id);
+        console.log(`Agent ${id} set to available`);
+    } else {
+        await databaseManager.setAgentUnavailable(id);
+        console.log(`Agent ${id} set to unavailable`);
+    }
+    agentCount -= 1;
+    if (agentCount === 0) {
+        rainbowReady = true;
+        console.log("All agent statuses set, Allocabl is ready");
+    }
+};
+
+const onAgentStatusChange = async (id, presence) => {
+    if (presence === "online") {
+        await databaseManager.setAgentAvailable(id);
+        console.log(`Agent ${id} set to available`);
+    } else {
+        await databaseManager.setAgentUnavailable(id);
+        console.log(`Agent ${id} set to unavailable`);
+    }
 };
 
 module.exports = { getRainbowReady, getRainbowSDK };

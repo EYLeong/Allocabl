@@ -70,10 +70,36 @@ const removeSocketAgent = socketID => {
     });
 };
 
+const setAgentAvailable = agentID => {
+    return new Promise((resolve, reject) => {
+        createConnection().query(
+            `UPDATE agents SET available = 1 WHERE id = '${agentID}'`,
+            (err, result) => {
+                if (err) reject(err);
+                resolve(result);
+            }
+        );
+    });
+};
+
+const setAgentUnavailable = agentID => {
+    return new Promise((resolve, reject) => {
+        createConnection().query(
+            `UPDATE agents SET available = 0 WHERE id = '${agentID}'`,
+            (err, result) => {
+                if (err) reject(err);
+                resolve(result);
+            }
+        );
+    });
+};
+
 module.exports = {
     getAgent,
     incrementCustomersServed,
     toggleAgentAvailability,
     addSocketAgent,
-    removeSocketAgent
+    removeSocketAgent,
+    setAgentAvailable,
+    setAgentUnavailable
 };
