@@ -22,6 +22,18 @@ function getAgent(department) {
     });
 }
 
+function getDepartment(socketID) {
+    return new Promise(function(resolve, reject) {
+        createConnection().query(
+            `SELECT department FROM agents WHERE customerSocket='${socketID}'`,
+            function(err, rows) {
+                if (err) reject(err);
+                resolve(rows);
+            }
+        );
+    });
+}
+
 const incrementCustomersServed = agentID => {
     return new Promise((resolve, reject) => {
         createConnection().query(
@@ -107,6 +119,30 @@ const addWaitList = (department, socketID) => {
     });
 };
 
+const getFromWaitList = department => {
+    return new Promise((resolve, reject) => {
+        createConnection().query(
+            `SELECT socket_id FROM allocabl.waitlist_${department} ORDER BY id asc LIMIT 1`,
+            (err, nextInList) => {
+                if (err) reject(err);
+                resolve(nextInList);
+            }
+        );
+    });
+};
+
+const removeFromWaitList = department => {
+    return new Promise((resolve, reject) => {
+        createConnection().query(
+            `DELETE FROM allocabl.waitlist_${department} ORDER BY id asc LIMIT 1` ,
+            (err, dump) => {
+                if (err) reject(err);
+                resolve(dump);
+            }
+        );
+    });
+};
+
 module.exports = {
     getAgent,
     incrementCustomersServed,
@@ -115,5 +151,8 @@ module.exports = {
     removeSocketAgent,
     setAgentAvailable,
     setAgentUnavailable,
-    addWaitList
+    addWaitList,
+    getDepartment,
+    getFromWaitList,
+    removeFromWaitList
 };

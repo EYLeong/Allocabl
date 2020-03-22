@@ -4,10 +4,20 @@ const databaseManager = require("./databaseManager");
 const disconnect = async socket => {
     console.log(`a user with socket id ${socket.id} disconnected`);
     try {
+        let rows = await databaseManager.getDepartment(socket.id);
         let result = await databaseManager.removeSocketAgent(socket.id);
         console.log(
             `customerSocket ${socket.id} removed successfully from database`
         );
+        if (rows.length!=0) {
+            let nextInList = await databaseManager.getFromWaitList(rows[0].department);
+            if (nextInList.length!=0) {
+                dump = await databaseManager.removeFromWaitList(rows[0].department);
+                let socket = global.io.sockets.connected[nextInList[0].socket_id];
+                socket.emit("agentAvailable", "An agent is now available! Connecting you to a sales agent...");
+                loginGuest(socket, rows[0].department);
+            }
+        }
     } catch (err) {
         console.log(err);
     }
@@ -17,7 +27,7 @@ const loginGuest = async (socket, department) => {
     if (rainbowInit.getRainbowReady()) {
         try {
             let rows = await databaseManager.getAgent(department);
-            if (rows.length !== 0) {
+            if (rows.length != 0) {
                 let result = await databaseManager.toggleAgentAvailability(
                     rows[0].id
                 );
@@ -53,7 +63,7 @@ const loginGuest = async (socket, department) => {
                     department,
                     socket.id
                 )
-                socket.emit("customError", "No agent available!");
+                socket.emit("waitList", "No agent available! Added to waitlist!");
             }
         } catch (err) {
             console.log(err);

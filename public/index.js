@@ -22,6 +22,14 @@ $(function() {
         let dept = await initialPrompt(botui);
         if (dept) socket.emit("loginGuest", dept);
     });
+    socket.on("waitList", async msg => {
+        customError(msg);
+        await botui.message.add({ content: msg });
+    });
+    socket.on("agentAvailable", async msg => {
+        customError(msg);
+        await botui.message.add({ content: msg });
+    });
 
     /* Listen to the SDK event RAINBOW_ONREADY */
     document.addEventListener(rainbowSDK.RAINBOW_ONREADY, async () => {
