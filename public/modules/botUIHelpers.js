@@ -53,25 +53,11 @@ const departmentPrompt = async botui => {
 };
 
 const departmentChosen = async (botui, dept) => {
-    if (dept === "sales") {
-        await botui.message.add({
-            // show a message
-            delay: 300,
-            content: "Connecting you to a sales agent..."
-        });
-    } else if (dept === "finance") {
-        await botui.message.add({
-            // show a message
-            delay: 300,
-            content: "Connecting you to a finance agent..."
-        });
-    } else if (dept === "general") {
-        await botui.message.add({
-            // show a message
-            delay: 300,
-            content: "Connecting you to a general agent..."
-        });
-    }
+    await botui.message.add({
+        // show a message
+        delay: 300,
+        content: `Connecting you to a ${dept} agent...`
+    });
     return dept;
 };
 

@@ -14,7 +14,7 @@ const disconnect = async socket => {
             if (nextInList.length!=0) {
                 dump = await databaseManager.removeFromWaitList(rows[0].department);
                 let socket = global.io.sockets.connected[nextInList[0].socket_id];
-                socket.emit("agentAvailable", "An agent is now available! Connecting you to a sales agent...");
+                socket.emit("agentAvailable", `An agent is now available! Connecting you to a ${rows[0].department} agent...`);
                 loginGuest(socket, rows[0].department);
             }
         }
