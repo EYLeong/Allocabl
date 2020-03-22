@@ -1,5 +1,5 @@
-const rainbowInit = require("../helpers/rainbowInit");
-const databaseManager = require("../helpers/databaseManager");
+const rainbowInit = require("./rainbowInit");
+const databaseManager = require("./databaseManager");
 
 const disconnect = async socket => {
     console.log(`a user with socket id ${socket.id} disconnected`);
@@ -49,6 +49,10 @@ const loginGuest = async (socket, department) => {
                 }
             } else {
                 console.log("No agent available!");
+                result = await databaseManager.addWaitList(
+                    department,
+                    socket.id
+                )
                 socket.emit("customError", "No agent available!");
             }
         } catch (err) {

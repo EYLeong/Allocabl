@@ -3,7 +3,7 @@ const mysql = require("mysql");
 const createConnection = () => {
     return mysql.createConnection({
         host: "localhost",
-        user: "allocabl",
+        user: "root",
         password: "Password123",
         database: "allocabl",
         multipleStatements: true
@@ -94,6 +94,19 @@ const setAgentUnavailable = agentID => {
     });
 };
 
+const addWaitList = (department, socketID) => {
+    return new Promise((resolve, reject) => {
+        createConnection().query(
+            `INSERT INTO waitlist_${department}(socket_id)
+            VALUES('${socketID}')`,
+            (err, result) => {
+                if (err) reject(err);
+                resolve(result);
+            }
+        );
+    });
+};
+
 module.exports = {
     getAgent,
     incrementCustomersServed,
@@ -101,5 +114,6 @@ module.exports = {
     addSocketAgent,
     removeSocketAgent,
     setAgentAvailable,
-    setAgentUnavailable
+    setAgentUnavailable,
+    addWaitList
 };
