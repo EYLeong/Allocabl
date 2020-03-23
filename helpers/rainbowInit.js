@@ -1,5 +1,3 @@
-const databaseManager = require("./databaseManager");
-
 let rainbowReady = false;
 let agentCount = 0;
 
@@ -76,11 +74,13 @@ const initAgentStatusAll = async () => {
 
 const initAgentStatus = async (id, presence) => {
     if (presence === "online") {
+        await databaseManager.setAgentOnline(id);
         await databaseManager.setAgentAvailable(id);
-        console.log(`Agent ${id} set to available`);
+        console.log(`Agent ${id} set to online`);
     } else {
         await databaseManager.setAgentUnavailable(id);
-        console.log(`Agent ${id} set to unavailable`);
+        await databaseManager.setAgentOffline(id);
+        console.log(`Agent ${id} set to offline`);
     }
     agentCount -= 1;
     if (agentCount === 0) {
@@ -91,12 +91,28 @@ const initAgentStatus = async (id, presence) => {
 
 const onAgentStatusChange = async (id, presence) => {
     if (presence === "online") {
+        await databaseManager.setAgentOnline(id);
         await databaseManager.setAgentAvailable(id);
-        console.log(`Agent ${id} set to available`);
+        console.log(`Agent ${id} set to online`);
+        let rows = await databaseManager.getAgentDepartment(id);
+        socketEvents.checkWaitlist(rows[0].department);
     } else {
         await databaseManager.setAgentUnavailable(id);
-        console.log(`Agent ${id} set to unavailable`);
+        await databaseManager.setAgentOffline(id);
+        console.log(`Agent ${id} set to offline`);
+        let rows = await databaseManager.getAgentDepartment(id);
+        let waiters = await databaseManager.getDepartmentWaitlist(
+            rows[0].department
+        );
+        databaseManager.clearDepartmentWaitlist(rows[0].department);
+        for (waiting of waiters) {
+            let socket = global.io.sockets.connected[waiting.socket_id];
+            socket.emit("customError", "all agents have gone offline");
+        }
     }
 };
 
 module.exports = { getRainbowReady, getRainbowSDK };
+
+const databaseManager = require("./databaseManager");
+const socketEvents = require("./socketEvents");
