@@ -4,12 +4,14 @@
   "description": "test for rainbow",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "http-server": "^0.12.1"
+    "chai": "^4.2.0",
+    "http-server": "^0.12.1",
+    "mocha": "^7.1.1"
   },
   "dependencies": {
     "express": "^4.17.1",
