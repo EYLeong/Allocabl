@@ -4,15 +4,19 @@ const connectionPool = mysql.createPool({
     host: "localhost",
     user: "allocabl",
     password: "Password123",
-    database: "allocabl",
     multipleStatements: true
 });
 
-function getAgent(department, connection) {
-    connection = connection || connectionPool;
+let databaseName = "allocabl";
+
+const setDatabase = dbName => {
+    databaseName = dbName;
+};
+
+function getAgent(department) {
     return new Promise(function(resolve, reject) {
-        connection.query(
-            `SELECT id FROM agents WHERE available = 1 AND department = '${department}' ORDER BY customersServed`,
+        connectionPool.query(
+            `SELECT id FROM ${databaseName}.agents WHERE available = 1 AND department = '${department}' ORDER BY customersServed`,
             function(err, rows) {
                 if (err) reject(err);
                 resolve(rows);
@@ -21,11 +25,10 @@ function getAgent(department, connection) {
     });
 }
 
-const getAgentDepartment = (agentID, connection) => {
-    connection = connection || connectionPool;
+const getAgentDepartment = agentID => {
     return new Promise((resolve, reject) => {
-        connection.query(
-            `SELECT department FROM agents WHERE id = '${agentID}'`,
+        connectionPool.query(
+            `SELECT department FROM ${databaseName}.agents WHERE id = '${agentID}'`,
             (err, result) => {
                 if (err) reject(err);
                 resolve(result);
@@ -34,11 +37,10 @@ const getAgentDepartment = (agentID, connection) => {
     });
 };
 
-function getDepartment(socketID, connection) {
-    connection = connection || connectionPool;
+function getDepartment(socketID) {
     return new Promise(function(resolve, reject) {
-        connection.query(
-            `SELECT department FROM agents WHERE customerSocket='${socketID}'`,
+        connectionPool.query(
+            `SELECT department FROM ${databaseName}.agents WHERE customerSocket='${socketID}'`,
             function(err, rows) {
                 if (err) reject(err);
                 resolve(rows);
@@ -47,11 +49,10 @@ function getDepartment(socketID, connection) {
     });
 }
 
-const incrementCustomersServed = (agentID, connection) => {
-    connection = connection || connectionPool;
+const incrementCustomersServed = agentID => {
     return new Promise((resolve, reject) => {
-        connection.query(
-            `UPDATE agents SET customersServed = customersServed + 1 WHERE id = '${agentID}'`,
+        connectionPool.query(
+            `UPDATE ${databaseName}.agents SET customersServed = customersServed + 1 WHERE id = '${agentID}'`,
             (err, result) => {
                 if (err) reject(err);
                 resolve(result);
@@ -60,11 +61,10 @@ const incrementCustomersServed = (agentID, connection) => {
     });
 };
 
-const addSocketAgent = (agentID, socketID, connection) => {
-    connection = connection || connectionPool;
+const addSocketAgent = (agentID, socketID) => {
     return new Promise((resolve, reject) => {
-        connection.query(
-            `UPDATE agents SET customerSocket = '${socketID}' WHERE id = '${agentID}'`,
+        connectionPool.query(
+            `UPDATE ${databaseName}.agents SET customerSocket = '${socketID}' WHERE id = '${agentID}'`,
             (err, result) => {
                 if (err) reject(err);
                 resolve(result);
@@ -73,11 +73,10 @@ const addSocketAgent = (agentID, socketID, connection) => {
     });
 };
 
-const removeSocketAgent = (socketID, connection) => {
-    connection = connection || connectionPool;
+const removeSocketAgent = socketID => {
     return new Promise((resolve, reject) => {
-        connection.query(
-            `SET SQL_SAFE_UPDATES = 0;UPDATE agents SET available = 1, customerSocket = NULL WHERE customerSocket = '${socketID}';SET SQL_SAFE_UPDATES = 1`,
+        connectionPool.query(
+            `SET SQL_SAFE_UPDATES = 0;UPDATE ${databaseName}.agents SET available = 1, customerSocket = NULL WHERE customerSocket = '${socketID}';SET SQL_SAFE_UPDATES = 1`,
             (err, result) => {
                 if (err) reject(err);
                 resolve(result);
@@ -86,11 +85,10 @@ const removeSocketAgent = (socketID, connection) => {
     });
 };
 
-const setAgentAvailable = (agentID, connection) => {
-    connection = connection || connectionPool;
+const setAgentAvailable = agentID => {
     return new Promise((resolve, reject) => {
-        connection.query(
-            `UPDATE agents SET available = 1 WHERE id = '${agentID}'`,
+        connectionPool.query(
+            `UPDATE ${databaseName}.agents SET available = 1 WHERE id = '${agentID}'`,
             (err, result) => {
                 if (err) reject(err);
                 resolve(result);
@@ -99,11 +97,10 @@ const setAgentAvailable = (agentID, connection) => {
     });
 };
 
-const setAgentUnavailable = (agentID, connection) => {
-    connection = connection || connectionPool;
+const setAgentUnavailable = agentID => {
     return new Promise((resolve, reject) => {
-        connection.query(
-            `UPDATE agents SET available = 0 WHERE id = '${agentID}'`,
+        connectionPool.query(
+            `UPDATE ${databaseName}.agents SET available = 0 WHERE id = '${agentID}'`,
             (err, result) => {
                 if (err) reject(err);
                 resolve(result);
@@ -112,11 +109,10 @@ const setAgentUnavailable = (agentID, connection) => {
     });
 };
 
-const setAgentOnline = (agentID, connection) => {
-    connection = connection || connectionPool;
+const setAgentOnline = agentID => {
     return new Promise((resolve, reject) => {
-        connection.query(
-            `UPDATE agents SET online = 1 WHERE id = '${agentID}'`,
+        connectionPool.query(
+            `UPDATE ${databaseName}.agents SET online = 1 WHERE id = '${agentID}'`,
             (err, result) => {
                 if (err) reject(err);
                 resolve(result);
@@ -125,11 +121,10 @@ const setAgentOnline = (agentID, connection) => {
     });
 };
 
-const setAgentOffline = (agentID, connection) => {
-    connection = connection || connectionPool;
+const setAgentOffline = agentID => {
     return new Promise((resolve, reject) => {
-        connection.query(
-            `UPDATE agents SET online = 0 WHERE id = '${agentID}'`,
+        connectionPool.query(
+            `UPDATE ${databaseName}.agents SET online = 0 WHERE id = '${agentID}'`,
             (err, result) => {
                 if (err) reject(err);
                 resolve(result);
@@ -138,11 +133,10 @@ const setAgentOffline = (agentID, connection) => {
     });
 };
 
-const addWaitList = (department, socketID, connection) => {
-    connection = connection || connectionPool;
+const addWaitList = (department, socketID) => {
     return new Promise((resolve, reject) => {
-        connection.query(
-            `INSERT INTO waitlist_${department}(socket_id)
+        connectionPool.query(
+            `INSERT INTO ${databaseName}.waitlist_${department}(socket_id)
             VALUES('${socketID}')`,
             (err, result) => {
                 if (err) reject(err);
@@ -152,11 +146,10 @@ const addWaitList = (department, socketID, connection) => {
     });
 };
 
-const getFromWaitList = (department, connection) => {
-    connection = connection || connectionPool;
+const getFromWaitList = department => {
     return new Promise((resolve, reject) => {
-        connection.query(
-            `SELECT socket_id FROM allocabl.waitlist_${department} ORDER BY id asc LIMIT 1`,
+        connectionPool.query(
+            `SELECT socket_id FROM ${databaseName}.waitlist_${department} ORDER BY id asc LIMIT 1`,
             (err, nextInList) => {
                 if (err) reject(err);
                 resolve(nextInList);
@@ -165,11 +158,10 @@ const getFromWaitList = (department, connection) => {
     });
 };
 
-const removeFromWaitList = (department, connection) => {
-    connection = connection || connectionPool;
+const removeFromWaitList = department => {
     return new Promise((resolve, reject) => {
-        connection.query(
-            `DELETE FROM allocabl.waitlist_${department} ORDER BY id asc LIMIT 1`,
+        connectionPool.query(
+            `DELETE FROM ${databaseName}.waitlist_${department} ORDER BY id asc LIMIT 1`,
             (err, dump) => {
                 if (err) reject(err);
                 resolve(dump);
@@ -178,11 +170,10 @@ const removeFromWaitList = (department, connection) => {
     });
 };
 
-const removeFromAllWaitlistsById = (socketID, connection) => {
-    connection = connection || connectionPool;
+const removeFromAllWaitlistsById = socketID => {
     return new Promise((resolve, reject) => {
-        connection.query(
-            `SET SQL_SAFE_UPDATES = 0;DELETE FROM allocabl.waitlist_sales WHERE socket_id = '${socketID}';DELETE FROM allocabl.waitlist_finance WHERE socket_id = '${socketID}';DELETE FROM allocabl.waitlist_general WHERE socket_id = '${socketID}';SET SQL_SAFE_UPDATES = 1`,
+        connectionPool.query(
+            `SET SQL_SAFE_UPDATES = 0;DELETE FROM ${databaseName}.waitlist_sales WHERE socket_id = '${socketID}';DELETE FROM ${databaseName}.waitlist_finance WHERE socket_id = '${socketID}';DELETE FROM ${databaseName}.waitlist_general WHERE socket_id = '${socketID}';SET SQL_SAFE_UPDATES = 1`,
             (err, dump) => {
                 if (err) reject(err);
                 resolve(dump);
@@ -191,11 +182,10 @@ const removeFromAllWaitlistsById = (socketID, connection) => {
     });
 };
 
-const checkDepartmentOnline = (department, connection) => {
-    connection = connection || connectionPool;
+const checkDepartmentOnline = department => {
     return new Promise(function(resolve, reject) {
-        connection.query(
-            `SELECT id FROM agents WHERE online = 1 AND department = '${department}' ORDER BY customersServed`,
+        connectionPool.query(
+            `SELECT id FROM ${databaseName}.agents WHERE online = 1 AND department = '${department}' ORDER BY customersServed`,
             function(err, rows) {
                 if (err) reject(err);
                 resolve(rows);
@@ -204,11 +194,10 @@ const checkDepartmentOnline = (department, connection) => {
     });
 };
 
-const clearDepartmentWaitlist = (department, connection) => {
-    connection = connection || connectionPool;
+const clearDepartmentWaitlist = department => {
     return new Promise(function(resolve, reject) {
-        connection.query(
-            `SET SQL_SAFE_UPDATES = 0;DELETE FROM allocabl.waitlist_${department};SET SQL_SAFE_UPDATES = 1`,
+        connectionPool.query(
+            `SET SQL_SAFE_UPDATES = 0;DELETE FROM ${databaseName}.waitlist_${department};SET SQL_SAFE_UPDATES = 1`,
             function(err, rows) {
                 if (err) reject(err);
                 resolve(rows);
@@ -217,11 +206,10 @@ const clearDepartmentWaitlist = (department, connection) => {
     });
 };
 
-const getDepartmentWaitlist = (department, connection) => {
-    connection = connection || connectionPool;
+const getDepartmentWaitlist = department => {
     return new Promise(function(resolve, reject) {
-        connection.query(
-            `SELECT * FROM allocabl.waitlist_${department}`,
+        connectionPool.query(
+            `SELECT * FROM ${databaseName}.waitlist_${department}`,
             function(err, rows) {
                 if (err) reject(err);
                 resolve(rows);
@@ -247,5 +235,7 @@ module.exports = {
     getAgentDepartment,
     checkDepartmentOnline,
     clearDepartmentWaitlist,
-    getDepartmentWaitlist
+    getDepartmentWaitlist,
+    connectionPool,
+    setDatabase
 };
