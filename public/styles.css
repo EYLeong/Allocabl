@@ -1,8 +1,11 @@
-#support_image {
-    position:absolute;
-    bottom:49px;
-    right:49px;
-    z-index: 2;
+
+
+.support_image {
+    position: fixed;
+    bottom:20px;
+    right: 30px;
+    z-index: 1;
+    align-self: baseline;
 }
 #support_image:hover {
     transform: scale(1.05);
@@ -13,20 +16,22 @@
           transform: rotate(10deg);
 }
 
-#allocablPrompt {
-    position: absolute;
+.botui-app-container {
+    position: fixed;
     display: inline-block;
+    background-color: white;
     border-style: solid;
     border-radius: 20px;
     border-color: grey;
-    bottom:50px;
-    right:50px;
+    bottom:20px;
+    right:30px;
     visibility: hidden;
     overflow: hidden;
     z-index: 1;
 }
 #allocablPrompt.show {
     visibility: visible;
+    z-index: 1;
     -webkit-animation: fadeIn 1s;
     animation: fadeIn 1s
 }
