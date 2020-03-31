@@ -4,7 +4,7 @@
   "description": "test for rainbow",
   "main": "index.js",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha ./test/mochaTests"
   },
   "author": "",
   "license": "ISC",
