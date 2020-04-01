@@ -36,8 +36,8 @@ const loginGuest = async (socket, department) => {
             });
         } else {
             console.log("All agents busy");
-            result = await databaseManager.addWaitList(department, socket.id);
-            rows = await databaseManager.getDepartmentWaitlist(department);
+            let result = await databaseManager.addWaitList(department, socket.id);
+            let rows = await databaseManager.getDepartmentWaitlist(department);
             socket.emit("waitList", "All agents busy! Added to waitlist!");
             socket.emit("waitList", `Queue position: ${rows.length}`);
         }
@@ -64,7 +64,7 @@ const checkWaitlist = async department => {
 const updateClientsPositions = async department => {
     let rows = await databaseManager.getDepartmentWaitlist(department);
     for (var i=0; i<rows.length; i++) {
-        socket = io.sockets.connected[rows[i].socket_id];
+        let socket = io.sockets.connected[rows[i].socket_id];
         socket.emit(
             "waitList",
             `Queue position: ${i+1}`

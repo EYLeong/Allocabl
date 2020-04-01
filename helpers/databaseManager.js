@@ -3,7 +3,7 @@ const utils = require("./utils");
 
 const connectionPool = mysql.createPool({
     host: "localhost",
-    user: "root",
+    user: "allocabl",
     password: "Password123",
     multipleStatements: true
 });
@@ -283,6 +283,41 @@ const getDepartmentWaitlist = department => {
         });
     });
 };
+
+
+/* previous attempt to do server sided spam filtering, requires msgCount column in agents table
+const resetMessageCount = () => {
+    let sql = `SET SQL_SAFE_UPDATES = 0;UPDATE ${databaseName}.agents SET msgCount = 0;SET SQL_SAFE_UPDATES = 1`;
+    return new Promise((resolve, reject) => {
+        connectionPool.query(sql, (err, dump) => {
+            if (err) reject(err);
+            resolve(dump);
+        });
+    });
+};
+
+setInterval(function() {resetMessageCount() }, 60000);
+
+const getMessageCount = (socket_id) => {
+    let sql = `SELECT * FROM ${databaseName}.agents WHERE socket_id=${socket_id}`;
+    return new Promise((resolve, reject) => {
+        connectionPool.query(sql, (err, dump) => {
+            if (err) reject(err);
+            resolve(dump);
+        });
+    });
+};
+
+const incrementMessageCount = (socket_id) => {
+    let sql = `UPDATE ${databaseName}.agents SET msgCount=msgCount+1 WHERE socket_id=${socket_id}`;
+    return new Promise((resolve, reject) => {
+        connectionPool.query(sql, (err, dump) => {
+            if (err) reject(err);
+            resolve(dump);
+        });
+    });
+};
+*/
 
 module.exports = {
     getAgent,

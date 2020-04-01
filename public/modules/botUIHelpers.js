@@ -62,22 +62,24 @@ const departmentChosen = async (botui, dept) => {
     return dept;
 };
 
-const connected = async (botui, resCallback) => {
+const connected = async (socket, botui, resCallback) => {
     botui.message.removeAll();
     await botui.message.add({
         content: "You are now connected!"
     });
-    textInput(botui, resCallback);
+    textInput(socket, botui, resCallback);
 };
 
-const textInput = async (botui, resCallback) => {
+const textInput = async (socket, botui, resCallback) => {
     let result = await botui.action.text({
         action: {
             placeholder: "Type here"
         }
     });
-    resCallback(result);
-    textInput(botui, resCallback);
+    if (socket.connected) {
+        resCallback(result);
+        textInput(socket, botui, resCallback);
+    }
 };
 
 export { initialPrompt, connected };

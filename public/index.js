@@ -10,11 +10,25 @@ $(function() {
 
     const socket = io({ autoConnect: false });
 
+    var msgCount=0;
+
+    setInterval(resetMessageCount, 60000);
+
+    function resetMessageCount() {
+        msgCount=0;
+    }
+
     socket.on("loginInfo", async info => {
         let conversation = await loginInfo(rainbowSDK, info);
-        connected(botui, res =>
-            rainbowSDK.im.sendMessageToConversation(conversation, res.value)
-        );
+        connected(this, botui, res => {
+            if (msgCount<5) {
+                msgCount++;
+                rainbowSDK.im.sendMessageToConversation(conversation, res.value);
+            }
+            else {
+                botui.message.add({content: "Your message was not received by the agent. You can only send 5 messages every minute."});
+            }
+        });
     });
     socket.on("customError", async msg => {
         customError(msg);
@@ -41,6 +55,18 @@ $(function() {
 
     document.addEventListener(
         rainbowSDK.im.RAINBOW_ONNEWIMMESSAGERECEIVED,
-        event => botui.message.add({ content: event.detail.message.data })
+        event => {
+            let msg=event.detail.message.data;
+            let conversation=event.detail.conversation;
+            if (msg==="/endchat") {
+                socket.disconnect(true);
+                rainbowSDK.im.sendMessageToConversation(conversation, "Successfully disconnected.");
+                botui.message.add({ content: "You have been disconnected." });
+                botui.action.hide();
+            }
+            else {
+                botui.message.add({ content: msg })
+            }
+        }
     );
 });
