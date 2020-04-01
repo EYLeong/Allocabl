@@ -55,6 +55,7 @@ io.on("connection", socket => {
         try {
             await socketEvents.loginGuest(socket, department);
         } catch (err) {
+            scoket.emit("customError", "There is a problem with the server");
             console.log(err);
         }
     });
