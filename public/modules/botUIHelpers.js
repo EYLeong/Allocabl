@@ -16,6 +16,7 @@ const initialPrompt = async botui => {
             }
         ]
     });
+    document.getElementsByTagName("button")[0].setAttribute("id", "yes");
     if (res.value === "yes") {
         return departmentPrompt(botui);
     } else {
