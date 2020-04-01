@@ -3,7 +3,7 @@ const utils = require("./utils");
 
 const connectionPool = mysql.createPool({
     host: "localhost",
-    user: "allocabl",
+    user: "root",
     password: "Password123",
     multipleStatements: true
 });
