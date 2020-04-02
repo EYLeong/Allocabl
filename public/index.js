@@ -20,7 +20,7 @@ $(function() {
 
     socket.on("loginInfo", async info => {
         let conversation = await loginInfo(rainbowSDK, info);
-        connected(this, botui, res => {
+        connected(botui, res => {
             if (msgCount<5) {
                 msgCount++;
                 rainbowSDK.im.sendMessageToConversation(conversation, res.value);
