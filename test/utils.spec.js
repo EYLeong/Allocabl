@@ -1,5 +1,5 @@
 const expect = require("chai").expect;
-const utils = require("../../helpers/utils");
+const utils = require("../helpers/utils");
 
 describe("Utils", () => {
     describe("isAlphaNum", () => {

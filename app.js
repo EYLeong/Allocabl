@@ -14,6 +14,7 @@ rainbowSDK.events.on("rainbow_onready", async () => {
         for (contact of contacts) {
             if (!contact.adminType)
                 await rainbowEvents.onAgentStatusChange(
+                    rainbowSDK,
                     contact.id,
                     contact.presence
                 );
@@ -33,7 +34,11 @@ rainbowSDK.events.on("rainbow_onstopped", () => {
 
 rainbowSDK.events.on("rainbow_oncontactpresencechanged", async contact => {
     try {
-        await rainbowEvents.onAgentStatusChange(contact.id, contact.presence);
+        await rainbowEvents.onAgentStatusChange(
+            rainbowSDK,
+            contact.id,
+            contact.presence
+        );
     } catch (err) {
         console.log(err);
     }
@@ -44,7 +49,7 @@ io.on("connection", socket => {
 
     socket.on("disconnect", async () => {
         try {
-            await socketEvents.disconnect(socket);
+            await socketEvents.disconnect(rainbowSDK, socket);
             console.log(`a user with socket id ${socket.id} disconnected`);
         } catch (err) {
             console.log(err);
@@ -53,7 +58,7 @@ io.on("connection", socket => {
 
     socket.on("loginGuest", async department => {
         try {
-            await socketEvents.loginGuest(socket, department);
+            await socketEvents.loginGuest(rainbowSDK, socket, department);
         } catch (err) {
             scoket.emit("customError", "There is a problem with the server");
             console.log(err);

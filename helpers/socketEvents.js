@@ -1,20 +1,19 @@
 const { io } = require("./server");
-const { rainbowSDK } = require("./rainbowInit");
 const databaseManager = require("./databaseManager");
 
-const disconnect = async socket => {
+const disconnect = async (rainbowSDK, socket) => {
     let rows = await databaseManager.getDepartment(socket.id);
     await databaseManager.removeSocketAgent(socket.id);
     if (rows.length != 0) {
         // Talking to agent, get the next person in queue
-        await checkWaitlist(rows[0].department);
+        await checkWaitlist(rainbowSDK, rows[0].department);
     } else {
         // Not talking to agent, remove from queue if queueing
         await databaseManager.removeFromAllWaitlistsById(socket.id);
     }
 };
 
-const loginGuest = async (socket, department) => {
+const loginGuest = async (rainbowSDK, socket, department) => {
     let online = await databaseManager.checkDepartmentOnline(department);
     if (online.length != 0) {
         let rows = await databaseManager.getAgent(department);
@@ -45,7 +44,7 @@ const loginGuest = async (socket, department) => {
     }
 };
 
-const checkWaitlist = async department => {
+const checkWaitlist = async (rainbowSDK, department) => {
     let nextInList = await databaseManager.getFromWaitList(department);
     if (nextInList.length != 0) {
         await databaseManager.removeFromWaitList(department);
@@ -54,7 +53,7 @@ const checkWaitlist = async department => {
             "agentAvailable",
             `An agent is now available! Connecting you to a ${department} agent...`
         );
-        await loginGuest(socket, department);
+        await loginGuest(rainbowSDK, socket, department);
     }
 };
 

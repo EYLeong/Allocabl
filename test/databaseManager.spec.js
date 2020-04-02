@@ -1,5 +1,5 @@
 const expect = require("chai").expect;
-const databaseManager = require("../../helpers/databaseManager");
+const databaseManager = require("../helpers/databaseManager");
 
 const promiseQuery = sqlString => {
     return new Promise((resolve, reject) => {
