@@ -224,13 +224,17 @@ const removeFromWaitList = department => {
     });
 };
 
-const removeFromAllWaitlistsById = socketID => {
-    if (typeof socketID !== "string")
+const removeFromWaitlistById = (department, socketID) => {
+    if (typeof department !== "string" || typeof socketID !== "string")
         return new Promise((resolve, reject) => {
             reject(new Error("parameters must be of type string"));
         });
-    let sql = `SET SQL_SAFE_UPDATES = 0;DELETE FROM ${databaseName}.waitlist_sales WHERE socket_id = ?;DELETE FROM ${databaseName}.waitlist_finance WHERE socket_id = ?;DELETE FROM ${databaseName}.waitlist_general WHERE socket_id = ?;SET SQL_SAFE_UPDATES = 1`;
-    let inserts = [socketID, socketID, socketID];
+    if (!utils.isAlphaNum(department))
+        return new Promise((resolve, reject) => {
+            reject(new Error("department must be alphanumeric"));
+        });
+    let sql = `SET SQL_SAFE_UPDATES = 0;DELETE FROM ${databaseName}.waitlist_${department} WHERE socket_id = ?;SET SQL_SAFE_UPDATES = 1;`;
+    let inserts = [socketID];
     sql = mysql.format(sql, inserts);
     return new Promise((resolve, reject) => {
         connectionPool.query(sql, (err, dump) => {
@@ -284,6 +288,34 @@ const getDepartmentWaitlist = department => {
     });
 };
 
+const findSocketWaitlist = (department, socketID) => {
+    if (typeof department !== "string" || typeof socketID !== "string")
+        return new Promise((resolve, reject) => {
+            reject(new Error("parameters must be of type string"));
+        });
+    if (!utils.isAlphaNum(department))
+        return new Promise((resolve, reject) => {
+            reject(new Error("department must be alphanumeric"));
+        });
+    let sql = `SELECT * FROM ${databaseName}.waitlist_${department} WHERE socket_id = ?`;
+    let inserts = [socketID];
+    sql = mysql.format(sql, inserts);
+    return new Promise(function(resolve, reject) {
+        connectionPool.query(sql, function(err, rows) {
+            if (err) reject(err);
+            resolve(rows);
+        });
+    });
+};
+
+const findSocketWaitlistDepartment = async socketID => {
+    for (dept of ["sales", "finance", "general"]) {
+        let rows = await findSocketWaitlist(dept, socketID);
+        if (rows.length !== 0) return dept;
+    }
+    return null;
+};
+
 module.exports = {
     getAgent,
     incrementCustomersServed,
@@ -297,11 +329,13 @@ module.exports = {
     removeFromWaitList,
     setAgentOnline,
     setAgentOffline,
-    removeFromAllWaitlistsById,
+    removeFromWaitlistById,
     getAgentDepartment,
     checkDepartmentOnline,
     clearDepartmentWaitlist,
     getDepartmentWaitlist,
     connectionPool,
-    setDatabase
+    setDatabase,
+    findSocketWaitlist,
+    findSocketWaitlistDepartment
 };
