@@ -55,7 +55,10 @@ describe("rainbowEvents", () => {
     describe("onAgentStatusChange", () => {
         before("insert test values", async () => {
             let sql =
-                "INSERT INTO allocablTest.agents VALUES ('0','sales',0,10,NULL,0), ('1','sales',1,10,NULL,1)";
+                "INSERT INTO allocablTest.agents VALUES ('0','sales',0,10,NULL,0), ('1','sales',1,10,NULL,1),('2','finance',1,10,NULL,1)";
+            await promiseQuery(sql);
+            sql =
+                "INSERT INTO allocablTest.waitlist_finance VALUES ('1', 'testSocketID1'), ('2', 'testSocketID2')";
             await promiseQuery(sql);
         });
 
@@ -89,6 +92,49 @@ describe("rainbowEvents", () => {
             });
         });
 
-        describe("agent goes offline", () => {});
+        describe("agent goes offline", () => {
+            let socket1signal = 0;
+            let socket1data = 0;
+            const fakeSocket1 = {
+                id: "testSocketID1",
+                emit: (signal, data) => {
+                    if (signal === "customError") socket1signal++;
+                    if (data === "all agents have gone offline") socket1data++;
+                },
+            };
+
+            let socket2signal = 0;
+            let socket2data = 0;
+            const fakeSocket2 = {
+                id: "testSocketID2",
+                emit: (signal, data) => {
+                    if (signal === "customError") socket2signal++;
+                    if (data === "all agents have gone offline") socket2data++;
+                },
+            };
+            const fakeConnected = {
+                testSocketID1: fakeSocket1,
+                testSocketID2: fakeSocket2,
+            };
+            it("sets agent to offline and unavailable", async () => {
+                sinon.replace(io.sockets, "connected", fakeConnected);
+                await rainbowEvents.onAgentStatusChange(
+                    testSDK,
+                    "2",
+                    "offline"
+                );
+                let sql = "SELECT * FROM allocablTest.agents WHERE id = '2'";
+                let rows = await promiseQuery(sql);
+                expect(rows[0].available).to.equal(0);
+                expect(rows[0].online).to.equal(0);
+            });
+
+            it("notifies all affected waitlistees", async () => {
+                expect(socket1data).to.equal(1);
+                expect(socket1signal).to.equal(1);
+                expect(socket2data).to.equal(1);
+                expect(socket2signal).to.equal(1);
+            });
+        });
     });
 });
