@@ -1,7 +1,7 @@
 const expect = require("chai").expect;
 const databaseManager = require("../helpers/databaseManager");
 
-const promiseQuery = sqlString => {
+const promiseQuery = (sqlString) => {
     return new Promise((resolve, reject) => {
         databaseManager.connectionPool.query(sqlString, (err, result) => {
             if (err) reject(err);
@@ -10,7 +10,7 @@ const promiseQuery = sqlString => {
     });
 };
 
-const securityTests = async func => {
+const securityTests = async (func) => {
     it("is protected against sql injection", async () => {
         await func("'; DROP allocablTest.agents");
         let rows = await promiseQuery("SELECT * FROM allocablTest.agents");
@@ -41,7 +41,7 @@ const securityTests = async func => {
     });
 };
 
-const waitlistSecurityTests = async func => {
+const waitlistSecurityTests = async (func) => {
     it("throws an error if the department does not exist", async () => {
         try {
             await func("invalid");
@@ -81,14 +81,66 @@ const waitlistSecurityTests = async func => {
     });
 };
 
-describe("DatabaseManager", function() {
-    before("create database", async function() {
+const waitlistSecurityTests2 = async (func) => {
+    it("throws an error if the department does not exist", async () => {
+        try {
+            await func("invalid", "customer1");
+        } catch (err) {
+            expect(err).to.have.property(
+                "sqlMessage",
+                "Table 'allocablTest.waitlist_invalid' doesn't exist"
+            );
+        }
+    });
+
+    it("throws an error if the department is not alphanumeric", async () => {
+        try {
+            await func("asdf8(", "test");
+        } catch (err) {
+            expect(err.message).to.be.equal("department must be alphanumeric");
+        }
+    });
+
+    it("throws an error if the parameters are not strings", async () => {
+        try {
+            await func({ test: "test" }, "test");
+        } catch (err) {
+            expect(err.message).to.be.equal(
+                "parameters must be of type string"
+            );
+        }
+
+        try {
+            await func("test", { test: "test" });
+        } catch (err) {
+            expect(err.message).to.be.equal(
+                "parameters must be of type string"
+            );
+        }
+    });
+
+    it("throws an error if the database name is wrong", async () => {
+        databaseManager.setDatabase("invalid");
+        try {
+            await func("test", "test");
+        } catch (err) {
+            expect(err).to.have.property(
+                "sqlMessage",
+                "Unknown database 'invalid'"
+            );
+        }
+        databaseManager.setDatabase("allocablTest");
+    });
+};
+
+describe("DatabaseManager", function () {
+    before("create database", async function () {
         await promiseQuery(
             "DROP DATABASE IF EXISTS allocablTest;CREATE DATABASE allocablTest;"
         );
     });
 
-    after("drop database and close connection pool", async function() {
+    after("drop database and close connection pool", async function () {
         await promiseQuery("DROP DATABASE IF EXISTS allocablTest");
         databaseManager.connectionPool.end();
     });
@@ -127,14 +179,14 @@ describe("DatabaseManager", function() {
         });
     });
 
-    describe("Agents", function() {
-        before("create table", async function() {
+    describe("Agents", function () {
+        before("create table", async function () {
             let sql =
                 "DROP TABLE IF EXISTS allocablTest.agents;CREATE TABLE allocablTest.agents (id varchar(24) NOT NULL, department varchar(100) DEFAULT NULL, available tinyint(1) DEFAULT NULL, customersServed int DEFAULT NULL, customerSocket char(100) DEFAULT NULL, online tinyint(1) DEFAULT NULL, PRIMARY KEY (`id`))";
             await promiseQuery(sql);
         });
 
-        after("drop table", async function() {
+        after("drop table", async function () {
             await promiseQuery("DROP TABLE IF EXISTS allocablTest.agents");
         });
 
@@ -152,7 +204,7 @@ describe("DatabaseManager", function() {
                 );
             });
 
-            it("returns available agents with correct department, ordered by customers served", async function() {
+            it("returns available agents with correct department, ordered by customers served", async function () {
                 let rows = await databaseManager.getAgent("sales");
                 expect(rows).to.have.lengthOf(2);
                 expect(rows[0].id).to.equal("1");
@@ -185,7 +237,7 @@ describe("DatabaseManager", function() {
                 );
             });
 
-            it("returns department of agent", async function() {
+            it("returns department of agent", async function () {
                 let rows = await databaseManager.getAgentDepartment("1");
                 expect(rows[0].department).to.equal("sales");
                 rows = await databaseManager.getAgentDepartment("2");
@@ -214,7 +266,7 @@ describe("DatabaseManager", function() {
                 );
             });
 
-            it("returns department of agent currently engaged to customerSocket", async function() {
+            it("returns department of agent currently engaged to customerSocket", async function () {
                 let rows = await databaseManager.getDepartment("customer1");
                 expect(rows[0].department).to.equal("sales");
             });
@@ -241,7 +293,7 @@ describe("DatabaseManager", function() {
                 );
             });
 
-            it("increments the number of customers served of an agent", async function() {
+            it("increments the number of customers served of an agent", async function () {
                 await databaseManager.incrementCustomersServed("1");
                 let rows = await promiseQuery(
                     "SELECT customersServed FROM allocablTest.agents ORDER BY id"
@@ -274,7 +326,7 @@ describe("DatabaseManager", function() {
                 );
             });
 
-            it("adds a customerSocket to agent", async function() {
+            it("adds a customerSocket to agent", async function () {
                 await databaseManager.addSocketAgent("3", "customerA");
                 let rows = await promiseQuery(
                     "SELECT customerSocket FROM allocablTest.agents ORDER BY id"
@@ -326,7 +378,7 @@ describe("DatabaseManager", function() {
                 }
                 try {
                     await databaseManager.addSocketAgent("string", {
-                        test: "test"
+                        test: "test",
                     });
                 } catch (err) {
                     expect(err.message).to.be.equal(
@@ -383,7 +435,7 @@ describe("DatabaseManager", function() {
                 );
             });
 
-            it("sets an agent to available", async function() {
+            it("sets an agent to available", async function () {
                 await databaseManager.setAgentAvailable("2");
                 let rows = await promiseQuery(
                     "SELECT available FROM allocablTest.agents ORDER BY id"
@@ -414,7 +466,7 @@ describe("DatabaseManager", function() {
                 );
             });
 
-            it("sets an agent to unavailable", async function() {
+            it("sets an agent to unavailable", async function () {
                 await databaseManager.setAgentUnavailable("1");
                 let rows = await promiseQuery(
                     "SELECT available FROM allocablTest.agents ORDER BY id"
@@ -447,7 +499,7 @@ describe("DatabaseManager", function() {
                 );
             });
 
-            it("sets an agent to online", async function() {
+            it("sets an agent to online", async function () {
                 await databaseManager.setAgentOnline("2");
                 let rows = await promiseQuery(
                     "SELECT online FROM allocablTest.agents ORDER BY id"
@@ -478,7 +530,7 @@ describe("DatabaseManager", function() {
                 );
             });
 
-            it("sets an agent to offline", async function() {
+            it("sets an agent to offline", async function () {
                 await databaseManager.setAgentOffline("2");
                 let rows = await promiseQuery(
                     "SELECT online FROM allocablTest.agents ORDER BY id"
@@ -509,7 +561,7 @@ describe("DatabaseManager", function() {
                 );
             });
 
-            it("returns all online agents from specified department", async function() {
+            it("returns all online agents from specified department", async function () {
                 let rows = await databaseManager.checkDepartmentOnline("sales");
                 expect(rows).to.have.lengthOf(1);
             });
@@ -532,14 +584,14 @@ describe("DatabaseManager", function() {
         });
     });
 
-    describe("Waitlists", function() {
-        before("create table and use database", async function() {
+    describe("Waitlists", function () {
+        before("create table and use database", async function () {
             let sql =
                 "DROP TABLE IF EXISTS allocablTest.waitlist_sales;CREATE TABLE allocablTest.waitlist_sales (id int NOT NULL AUTO_INCREMENT, socket_id varchar(255) DEFAULT NULL, PRIMARY KEY (id));DROP TABLE IF EXISTS allocablTest.waitlist_finance;CREATE TABLE allocablTest.waitlist_finance (id int NOT NULL AUTO_INCREMENT, socket_id varchar(255) DEFAULT NULL, PRIMARY KEY (id));DROP TABLE IF EXISTS allocablTest.waitlist_general;CREATE TABLE allocablTest.waitlist_general (id int NOT NULL AUTO_INCREMENT, socket_id varchar(255) DEFAULT NULL, PRIMARY KEY (id));";
             await promiseQuery(sql);
         });
 
-        after("drop table", async function() {
+        after("drop table", async function () {
             await promiseQuery(
                 "DROP TABLE IF EXISTS allocablTest.waitlist_sales;DROP TABLE IF EXISTS allocablTest.waitlist_finance;DROP TABLE IF EXISTS allocablTest.waitlist_general;"
             );
@@ -556,7 +608,7 @@ describe("DatabaseManager", function() {
                 );
             });
 
-            it("adds sockets to waitlist in insertion order", async function() {
+            it("adds sockets to waitlist in insertion order", async function () {
                 await databaseManager.addWaitList("sales", "customer1");
                 await databaseManager.addWaitList("sales", "customer2");
                 let rows = await promiseQuery(
@@ -578,57 +630,7 @@ describe("DatabaseManager", function() {
                 expect(rows).to.have.lengthOf(3);
             });
 
-            it("throws an error if the department does not exist", async () => {
-                try {
-                    await databaseManager.addWaitList("invalid", "customer1");
-                } catch (err) {
-                    expect(err).to.have.property(
-                        "sqlMessage",
-                        "Table 'allocablTest.waitlist_invalid' doesn't exist"
-                    );
-                }
-            });
-
-            it("throws an error if the department is not alphanumeric", async () => {
-                try {
-                    await databaseManager.addWaitList("asdf8(", "test");
-                } catch (err) {
-                    expect(err.message).to.be.equal(
-                        "department must be alphanumeric"
-                    );
-                }
-            });
-
-            it("throws an error if the parameters are not strings", async () => {
-                try {
-                    await databaseManager.addWaitList({ test: "test" }, "test");
-                } catch (err) {
-                    expect(err.message).to.be.equal(
-                        "parameters must be of type string"
-                    );
-                }
-
-                try {
-                    await databaseManager.addWaitList("test", { test: "test" });
-                } catch (err) {
-                    expect(err.message).to.be.equal(
-                        "parameters must be of type string"
-                    );
-                }
-            });
-
-            it("throws an error if the database name is wrong", async () => {
-                databaseManager.setDatabase("invalid");
-                try {
-                    await databaseManager.addWaitList("test", "test");
-                } catch (err) {
-                    expect(err).to.have.property(
-                        "sqlMessage",
-                        "Unknown database 'invalid'"
-                    );
-                }
-                databaseManager.setDatabase("allocablTest");
-            });
+            waitlistSecurityTests2(databaseManager.addWaitList);
         });
 
         describe("getFromWaitList", () => {
@@ -645,7 +647,7 @@ describe("DatabaseManager", function() {
                 );
             });
 
-            it("returns the next customer in the waitlist for a department", async function() {
+            it("returns the next customer in the waitlist for a department", async function () {
                 let rows = await databaseManager.getFromWaitList("sales");
                 expect(rows).to.have.lengthOf(1);
                 expect(rows[0].socket_id).to.be.equal("customer1");
@@ -673,7 +675,7 @@ describe("DatabaseManager", function() {
                 );
             });
 
-            it("removes the next customer from a waitlist by department", async function() {
+            it("removes the next customer from a waitlist by department", async function () {
                 await databaseManager.removeFromWaitList("sales");
                 let rows = await promiseQuery(
                     "SELECT socket_id FROM allocablTest.waitlist_sales"
@@ -693,7 +695,7 @@ describe("DatabaseManager", function() {
             waitlistSecurityTests(databaseManager.removeFromWaitList);
         });
 
-        describe("removeFromAllWaitlistsById", () => {
+        describe("removeFromWaitlistById", () => {
             before("insert data and set database", async () => {
                 let sql =
                     "INSERT INTO allocablTest.waitlist_sales(socket_id) VALUES('customer1');INSERT INTO allocablTest.waitlist_finance(socket_id) VALUES('customer2');";
@@ -707,62 +709,34 @@ describe("DatabaseManager", function() {
                 );
             });
 
-            it("removes a customer from all waitlists", async function() {
-                await databaseManager.removeFromAllWaitlistsById("customer1");
+            it("removes a customer from the specified department waitlist", async function () {
+                await databaseManager.removeFromWaitlistById(
+                    "sales",
+                    "customer1"
+                );
                 let rows = await promiseQuery(
                     "SELECT socket_id FROM allocablTest.waitlist_sales"
                 );
                 expect(rows).to.have.lengthOf(0);
-                rows = await promiseQuery(
-                    "SELECT socket_id FROM allocablTest.waitlist_finance"
-                );
-                expect(rows).to.have.lengthOf(1);
             });
 
-            it("does nothing if the customer is not in any waitlist", async () => {
-                let result = await databaseManager.removeFromAllWaitlistsById(
+            it("does nothing if the customer is not in the waitlist", async () => {
+                let result = await databaseManager.removeFromWaitlistById(
+                    "finance",
                     "invalid"
                 );
-                for (obj of result) {
-                    expect(obj).to.have.property("affectedRows", 0);
-                    expect(obj).to.have.property("changedRows", 0);
-                }
             });
 
             it("is protected against sql injection", async () => {
-                let result = await databaseManager.removeFromAllWaitlistsById(
-                    "';DROP allocablTest.waitlist_sales;"
+                let result = await databaseManager.removeFromWaitlistById(
+                    "finance",
+                    "';DROP allocablTest.waitlist_finance;"
                 );
-                for (obj of result) {
-                    expect(obj).to.have.property("affectedRows", 0);
-                    expect(obj).to.have.property("changedRows", 0);
-                }
+                expect(result[1]).to.have.property("affectedRows", 0);
+                expect(result[1]).to.have.property("changedRows", 0);
             });
 
-            it("throws an error if the parameters are not strings", async () => {
-                try {
-                    await databaseManager.removeFromAllWaitlistsById({
-                        test: "test"
-                    });
-                } catch (err) {
-                    expect(err.message).to.be.equal(
-                        "parameters must be of type string"
-                    );
-                }
-            });
-
-            it("throws an error if the database name is wrong", async () => {
-                databaseManager.setDatabase("invalid");
-                try {
-                    await databaseManager.removeFromAllWaitlistsById("test");
-                } catch (err) {
-                    expect(err).to.have.property(
-                        "sqlMessage",
-                        "Unknown database 'invalid'"
-                    );
-                }
-                databaseManager.setDatabase("allocablTest");
-            });
+            waitlistSecurityTests2(databaseManager.removeFromWaitlistById);
         });
 
         describe("clearDepartmentWaitlist", () => {
@@ -779,7 +753,7 @@ describe("DatabaseManager", function() {
                 );
             });
 
-            it("clears the waitlist of a particular department", async function() {
+            it("clears the waitlist of a particular department", async function () {
                 await databaseManager.clearDepartmentWaitlist("sales");
                 let rows = await promiseQuery(
                     "SELECT * FROM allocablTest.waitlist_sales"
@@ -804,7 +778,7 @@ describe("DatabaseManager", function() {
                 );
             });
 
-            it("returns the waitlist of a particular department", async function() {
+            it("returns the waitlist of a particular department", async function () {
                 let rows = await databaseManager.getDepartmentWaitlist("sales");
                 expect(rows).to.have.lengthOf(2);
                 expect(rows[0].socket_id).to.be.equal("customer1");
@@ -818,6 +792,95 @@ describe("DatabaseManager", function() {
             });
 
             waitlistSecurityTests(databaseManager.getDepartmentWaitlist);
+        });
+
+        describe("findSocketWaitlist", async () => {
+            before("insert data and set database", async () => {
+                let sql =
+                    "INSERT INTO allocablTest.waitlist_sales(socket_id) VALUES('customer1');INSERT INTO allocablTest.waitlist_finance(socket_id) VALUES('customer2');";
+                await promiseQuery(sql);
+                databaseManager.setDatabase("allocablTest");
+            });
+
+            after("clear tables", async () => {
+                await promiseQuery(
+                    "SET SQL_SAFE_UPDATES = 0;DELETE FROM allocablTest.waitlist_sales;DELETE FROM allocablTest.waitlist_finance;DELETE FROM allocablTest.waitlist_general;SET SQL_SAFE_UPDATES = 1"
+                );
+            });
+
+            it("looks for a socket ID in a given department's waitlist", async () => {
+                let rows = await databaseManager.findSocketWaitlist(
+                    "sales",
+                    "customer1"
+                );
+                expect(rows).to.have.lengthOf(1);
+                expect(rows[0].socket_id).to.equal("customer1");
+            });
+
+            it("is empty if the entry is not found", async () => {
+                let rows = await databaseManager.findSocketWaitlist(
+                    "finance",
+                    "test"
+                );
+                expect(rows).to.have.lengthOf(0);
+            });
+
+            it("is protected against sql injection", async () => {
+                await databaseManager.findSocketWaitlist(
+                    "finance",
+                    "';DROP allocablTest.waitlist_finance;"
+                );
+                let rows = await promiseQuery(
+                    "SELECT * FROM allocablTest.waitlist_finance"
+                );
+                expect(rows).to.have.lengthOf(1);
+            });
+
+            waitlistSecurityTests2(databaseManager.findSocketWaitlist);
+        });
+
+        describe("findSocketWaitlistDepartment", async () => {
+            before("insert data and set database", async () => {
+                let sql =
+                    "INSERT INTO allocablTest.waitlist_sales(socket_id) VALUES('customer1');INSERT INTO allocablTest.waitlist_finance(socket_id) VALUES('customer2');";
+                await promiseQuery(sql);
+                databaseManager.setDatabase("allocablTest");
+            });
+
+            after("clear tables", async () => {
+                await promiseQuery(
+                    "SET SQL_SAFE_UPDATES = 0;DELETE FROM allocablTest.waitlist_sales;DELETE FROM allocablTest.waitlist_finance;DELETE FROM allocablTest.waitlist_general;SET SQL_SAFE_UPDATES = 1"
+                );
+            });
+
+            it("returns the department of the waitlist that a given socket ID is in", async () => {
+                let dept = await databaseManager.findSocketWaitlistDepartment(
+                    "customer1"
+                );
+                expect(dept).to.be.equal("sales");
+            });
+
+            it("is protected against sql injection", async () => {
+                let dept = await databaseManager.findSocketWaitlistDepartment(
+                    "';DROP allocablTest.waitlist_finance;"
+                );
+                let rows = await promiseQuery(
+                    "SELECT * FROM allocablTest.waitlist_finance"
+                );
+                expect(rows).to.have.lengthOf(1);
+            });
+
+            it("throws an error if the parameters are not strings", async () => {
+                try {
+                    await databaseManager.findSocketWaitlistDepartment({
+                        test: "test",
+                    });
+                } catch (err) {
+                    expect(err.message).to.be.equal(
+                        "parameters must be of type string"
+                    );
+                }
+            });
         });
     });
 });

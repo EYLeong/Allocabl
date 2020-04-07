@@ -5,12 +5,12 @@ const connectionPool = mysql.createPool({
     host: "localhost",
     user: "allocabl",
     password: "Password123",
-    multipleStatements: true
+    multipleStatements: true,
 });
 
 let databaseName = "allocabl";
 
-const setDatabase = dbName => {
+const setDatabase = (dbName) => {
     if (!utils.isAlphaNum(dbName))
         throw new Error("database name must be alphanumeric");
     databaseName = dbName;
@@ -24,15 +24,15 @@ function getAgent(department) {
     let sql = `SELECT id FROM ${databaseName}.agents WHERE available = 1 AND department = ? ORDER BY customersServed`;
     let inserts = [department];
     sql = mysql.format(sql, inserts);
-    return new Promise(function(resolve, reject) {
-        connectionPool.query(sql, function(err, rows) {
+    return new Promise(function (resolve, reject) {
+        connectionPool.query(sql, function (err, rows) {
             if (err) reject(err);
             resolve(rows);
         });
     });
 }
 
-const getAgentDepartment = agentID => {
+const getAgentDepartment = (agentID) => {
     if (typeof agentID !== "string")
         return new Promise((resolve, reject) => {
             reject(new Error("parameters must be of type string"));
@@ -56,15 +56,15 @@ function getDepartment(socketID) {
     let sql = `SELECT department FROM ${databaseName}.agents WHERE customerSocket = ?`;
     let inserts = [socketID];
     sql = mysql.format(sql, inserts);
-    return new Promise(function(resolve, reject) {
-        connectionPool.query(sql, function(err, rows) {
+    return new Promise(function (resolve, reject) {
+        connectionPool.query(sql, function (err, rows) {
             if (err) reject(err);
             resolve(rows);
         });
     });
 }
 
-const incrementCustomersServed = agentID => {
+const incrementCustomersServed = (agentID) => {
     if (typeof agentID !== "string")
         return new Promise((resolve, reject) => {
             reject(new Error("parameters must be of type string"));
@@ -96,7 +96,7 @@ const addSocketAgent = (agentID, socketID) => {
     });
 };
 
-const removeSocketAgent = socketID => {
+const removeSocketAgent = (socketID) => {
     if (typeof socketID !== "string")
         return new Promise((resolve, reject) => {
             reject(new Error("parameters must be of type string"));
@@ -112,7 +112,7 @@ const removeSocketAgent = socketID => {
     });
 };
 
-const setAgentAvailable = agentID => {
+const setAgentAvailable = (agentID) => {
     if (typeof agentID !== "string")
         return new Promise((resolve, reject) => {
             reject(new Error("parameters must be of type string"));
@@ -128,7 +128,7 @@ const setAgentAvailable = agentID => {
     });
 };
 
-const setAgentUnavailable = agentID => {
+const setAgentUnavailable = (agentID) => {
     if (typeof agentID !== "string")
         return new Promise((resolve, reject) => {
             reject(new Error("parameters must be of type string"));
@@ -144,7 +144,7 @@ const setAgentUnavailable = agentID => {
     });
 };
 
-const setAgentOnline = agentID => {
+const setAgentOnline = (agentID) => {
     if (typeof agentID !== "string")
         return new Promise((resolve, reject) => {
             reject(new Error("parameters must be of type string"));
@@ -160,7 +160,7 @@ const setAgentOnline = agentID => {
     });
 };
 
-const setAgentOffline = agentID => {
+const setAgentOffline = (agentID) => {
     if (typeof agentID !== "string")
         return new Promise((resolve, reject) => {
             reject(new Error("parameters must be of type string"));
@@ -172,6 +172,22 @@ const setAgentOffline = agentID => {
         connectionPool.query(sql, (err, result) => {
             if (err) reject(err);
             resolve(result);
+        });
+    });
+};
+
+const checkDepartmentOnline = (department) => {
+    if (typeof department !== "string")
+        return new Promise((resolve, reject) => {
+            reject(new Error("parameters must be of type string"));
+        });
+    let sql = `SELECT id FROM ${databaseName}.agents WHERE online = 1 AND department = ? ORDER BY customersServed`;
+    let inserts = [department];
+    sql = mysql.format(sql, inserts);
+    return new Promise(function (resolve, reject) {
+        connectionPool.query(sql, function (err, rows) {
+            if (err) reject(err);
+            resolve(rows);
         });
     });
 };
@@ -196,7 +212,7 @@ const addWaitList = (department, socketID) => {
     });
 };
 
-const getFromWaitList = department => {
+const getFromWaitList = (department) => {
     if (!utils.isAlphaNum(department))
         return new Promise((resolve, reject) => {
             reject(new Error("department must be alphanumeric"));
@@ -210,7 +226,7 @@ const getFromWaitList = department => {
     });
 };
 
-const removeFromWaitList = department => {
+const removeFromWaitList = (department) => {
     if (!utils.isAlphaNum(department))
         return new Promise((resolve, reject) => {
             reject(new Error("department must be alphanumeric"));
@@ -244,44 +260,28 @@ const removeFromWaitlistById = (department, socketID) => {
     });
 };
 
-const checkDepartmentOnline = department => {
-    if (typeof department !== "string")
-        return new Promise((resolve, reject) => {
-            reject(new Error("parameters must be of type string"));
-        });
-    let sql = `SELECT id FROM ${databaseName}.agents WHERE online = 1 AND department = ? ORDER BY customersServed`;
-    let inserts = [department];
-    sql = mysql.format(sql, inserts);
-    return new Promise(function(resolve, reject) {
-        connectionPool.query(sql, function(err, rows) {
-            if (err) reject(err);
-            resolve(rows);
-        });
-    });
-};
-
-const clearDepartmentWaitlist = department => {
+const clearDepartmentWaitlist = (department) => {
     if (!utils.isAlphaNum(department))
         return new Promise((resolve, reject) => {
             reject(new Error("department must be alphanumeric"));
         });
     let sql = `SET SQL_SAFE_UPDATES = 0;DELETE FROM ${databaseName}.waitlist_${department};SET SQL_SAFE_UPDATES = 1`;
-    return new Promise(function(resolve, reject) {
-        connectionPool.query(sql, function(err, rows) {
+    return new Promise(function (resolve, reject) {
+        connectionPool.query(sql, function (err, rows) {
             if (err) reject(err);
             resolve(rows);
         });
     });
 };
 
-const getDepartmentWaitlist = department => {
+const getDepartmentWaitlist = (department) => {
     if (!utils.isAlphaNum(department))
         return new Promise((resolve, reject) => {
             reject(new Error("department must be alphanumeric"));
         });
     let sql = `SELECT * FROM ${databaseName}.waitlist_${department}`;
-    return new Promise(function(resolve, reject) {
-        connectionPool.query(sql, function(err, rows) {
+    return new Promise(function (resolve, reject) {
+        connectionPool.query(sql, function (err, rows) {
             if (err) reject(err);
             resolve(rows);
         });
@@ -300,15 +300,15 @@ const findSocketWaitlist = (department, socketID) => {
     let sql = `SELECT * FROM ${databaseName}.waitlist_${department} WHERE socket_id = ?`;
     let inserts = [socketID];
     sql = mysql.format(sql, inserts);
-    return new Promise(function(resolve, reject) {
-        connectionPool.query(sql, function(err, rows) {
+    return new Promise(function (resolve, reject) {
+        connectionPool.query(sql, function (err, rows) {
             if (err) reject(err);
             resolve(rows);
         });
     });
 };
 
-const findSocketWaitlistDepartment = async socketID => {
+const findSocketWaitlistDepartment = async (socketID) => {
     for (dept of ["sales", "finance", "general"]) {
         let rows = await findSocketWaitlist(dept, socketID);
         if (rows.length !== 0) return dept;
@@ -337,5 +337,5 @@ module.exports = {
     connectionPool,
     setDatabase,
     findSocketWaitlist,
-    findSocketWaitlistDepartment
+    findSocketWaitlistDepartment,
 };

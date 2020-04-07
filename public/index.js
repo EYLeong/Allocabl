@@ -3,7 +3,7 @@ import { customError, loginInfo } from "./modules/socketEventsClient.js";
 import { initialPrompt, connected, textInput } from "./modules/botUIHelpers.js";
 
 /* Wait for the page to load */
-$(function() {
+$(function () {
     rainbowInit();
 
     const botui = new BotUI("allocablPrompt");
@@ -25,7 +25,7 @@ $(function() {
         if (dept) socket.emit("loginGuest", dept);
     };
 
-    const forceDisconnect = async conversation => {
+    const forceDisconnect = async (conversation) => {
         next = false;
         socket.disconnect(true);
         await rainbowSDK.im.sendMessageToConversation(
@@ -40,11 +40,12 @@ $(function() {
     const processInput = async (input, conversation) => {
         msgCount++;
         if (msgCount < 5) {
+            console.log(input);
             rainbowSDK.im.sendMessageToConversation(conversation, input);
         } else {
             await botui.message.add({
                 content:
-                    "Your message was not received by the agent. You can only send 5 messages every 3 seconds."
+                    "Your message was not received by the agent. You can only send 5 messages every 3 seconds.",
             });
             if (msgCount === 5) {
                 warningCount++;
@@ -55,24 +56,24 @@ $(function() {
         }
     };
 
-    socket.on("loginInfo", async info => {
+    socket.on("loginInfo", async (info) => {
         let conversation = await loginInfo(rainbowSDK, info);
         await connected(botui);
         while (next) {
             let input = await textInput(botui);
-            await processInput(input, conversation);
+            await processInput(input.value, conversation);
         }
     });
 
-    socket.on("customError", async msg => {
+    socket.on("customError", async (msg) => {
         customError(msg);
         await botui.message.add({ content: msg });
         reprompt();
     });
-    socket.on("waitList", async msg => {
+    socket.on("waitList", async (msg) => {
         await botui.message.add({ content: msg });
     });
-    socket.on("agentAvailable", async msg => {
+    socket.on("agentAvailable", async (msg) => {
         await botui.message.add({ content: msg });
     });
 
@@ -88,7 +89,7 @@ $(function() {
 
     document.addEventListener(
         rainbowSDK.im.RAINBOW_ONNEWIMMESSAGERECEIVED,
-        event => {
+        (event) => {
             let msg = event.detail.message.data;
             let conversation = event.detail.conversation;
             if (msg === "/endchat") {
