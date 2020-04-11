@@ -1,7 +1,6 @@
 const { express, app, port, http, io } = require("./helpers/server");
-const socketEvents = require("./helpers/socketEvents");
 const { rainbowSDK } = require("./helpers/rainbowInit");
-const rainbowEvents = require("./helpers/rainbowEvents");
+const synchronized = require("./helpers/synchronized");
 
 app.use(express.static("public"));
 
@@ -13,7 +12,7 @@ rainbowSDK.events.on("rainbow_onready", async () => {
         let contacts = await rainbowSDK.contacts.getAll();
         for (contact of contacts) {
             if (!contact.adminType)
-                await rainbowEvents.onAgentStatusChange(
+                await synchronized.onAgentStatusChangeLocked(
                     rainbowSDK,
                     contact.id,
                     contact.presence
@@ -32,9 +31,9 @@ rainbowSDK.events.on("rainbow_onstopped", () => {
     console.log("ALLOCABL STOPPED");
 });
 
-rainbowSDK.events.on("rainbow_oncontactpresencechanged", async contact => {
+rainbowSDK.events.on("rainbow_oncontactpresencechanged", async (contact) => {
     try {
-        await rainbowEvents.onAgentStatusChange(
+        await synchronized.onAgentStatusChangeLocked(
             rainbowSDK,
             contact.id,
             contact.presence
@@ -44,23 +43,23 @@ rainbowSDK.events.on("rainbow_oncontactpresencechanged", async contact => {
     }
 });
 
-io.on("connection", socket => {
+io.on("connection", (socket) => {
     console.log(`a user with socket id ${socket.id} connected`);
 
     socket.on("disconnect", async () => {
         try {
-            await socketEvents.disconnect(rainbowSDK, socket);
+            await synchronized.disconnectLocked(rainbowSDK, socket);
             console.log(`a user with socket id ${socket.id} disconnected`);
         } catch (err) {
             console.log(err);
         }
     });
 
-    socket.on("loginGuest", async department => {
+    socket.on("loginGuest", async (department) => {
         try {
-            await socketEvents.loginGuest(rainbowSDK, socket, department);
+            await synchronized.loginGuestLocked(rainbowSDK, socket, department);
         } catch (err) {
-            scoket.emit("customError", "There is a problem with the server");
+            socket.emit("customError", "There is a problem with the server");
             console.log(err);
         }
     });

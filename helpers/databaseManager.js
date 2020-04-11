@@ -2,6 +2,7 @@ const mysql = require("mysql");
 const utils = require("./utils");
 
 const connectionPool = mysql.createPool({
+    connectionLimit: 1,
     host: "localhost",
     user: "allocabl",
     password: "Password123",
