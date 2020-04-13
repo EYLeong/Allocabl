@@ -30,7 +30,7 @@ let options = {
     },
 };
 
-for (let i = 1; i < 6; i++) {
+for (let i = 1; i < 2; i++) {
     options.credentials.login = `sales${i}@allocabl.com`;
     options.credentials.password = "Password123!";
     // Instantiate the SDK
@@ -51,3 +51,47 @@ for (let i = 1; i < 6; i++) {
         rainbowSDK.im.sendMessageToConversation(message.conversation, "hi");
     });
 }
+
+for (let i = 1; i < 6; i++) {
+    options.credentials.login = `finance${i}@allocabl.com`;
+    options.credentials.password = "Password123!";
+    // Instantiate the SDK
+    let rainbowSDK = new RainbowSDK(options);
+
+    // Start the SDK
+    rainbowSDK.start();
+
+    rainbowSDK.events.on("rainbow_onready", () => {
+        console.log("RAINBOW IS READY");
+    });
+
+    rainbowSDK.events.on("rainbow_onstopped", () => {
+        console.log("RAINBOW STOPPED");
+    });
+
+    rainbowSDK.events.on("rainbow_onmessagereceived", (message) => {
+        rainbowSDK.im.sendMessageToConversation(message.conversation, "hi");
+    });
+}
+
+// for (let i = 1; i < 6; i++) {
+//     options.credentials.login = `general${i}@allocabl.com`;
+//     options.credentials.password = "Password123!";
+//     // Instantiate the SDK
+//     let rainbowSDK = new RainbowSDK(options);
+
+//     // Start the SDK
+//     rainbowSDK.start();
+
+//     rainbowSDK.events.on("rainbow_onready", () => {
+//         console.log("RAINBOW IS READY");
+//     });
+
+//     rainbowSDK.events.on("rainbow_onstopped", () => {
+//         console.log("RAINBOW STOPPED");
+//     });
+
+//     rainbowSDK.events.on("rainbow_onmessagereceived", (message) => {
+//         rainbowSDK.im.sendMessageToConversation(message.conversation, "hi");
+//     });
+// }
