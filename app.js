@@ -11,12 +11,13 @@ rainbowSDK.events.on("rainbow_onready", async () => {
     try {
         let contacts = await rainbowSDK.contacts.getAll();
         for (contact of contacts) {
-            if (!contact.adminType)
+            if (!contact.adminType && !contact.isTerminated) {
                 await synchronized.onAgentStatusChangeLocked(
                     rainbowSDK,
                     contact.id,
                     contact.presence
                 );
+            }
         }
         http.listen(port, () => console.log(`App listening on port ${port}!`));
         console.log("ALLOCABL IS READY");

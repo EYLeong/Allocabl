@@ -16,6 +16,14 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Current Database: `allocabl`
+--
+
+CREATE DATABASE /*!32312 IF NOT EXISTS*/ `allocabl` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+
+USE `allocabl`;
+
+--
 -- Table structure for table `agents`
 --
 
@@ -39,7 +47,7 @@ CREATE TABLE `agents` (
 
 LOCK TABLES `agents` WRITE;
 /*!40000 ALTER TABLE `agents` DISABLE KEYS */;
-INSERT INTO `agents` VALUES ('5e440358e9f1273063695865','sales',0,0,NULL,0),('5e64973ad8084c29e64ec4ae','finance',0,0,NULL,0),('5e649782d8084c29e64ec4b7','general',0,0,NULL,0);
+INSERT INTO `agents` VALUES ('5e9464e335c8367f99ba3b28','sales',0,0,NULL,0),('5e94650035c8367f99ba3b31','sales',0,0,NULL,0),('5e94650735c8367f99ba3b3a','sales',0,0,NULL,0),('5e94650f35c8367f99ba3b43','sales',0,0,NULL,0),('5e94651635c8367f99ba3b4c','sales',0,0,NULL,0),('5e94652d35c8367f99ba3b55','finance',0,0,NULL,0),('5e94653535c8367f99ba3b5e','finance',0,0,NULL,0),('5e94653a35c8367f99ba3b67','finance',0,0,NULL,0),('5e94654135c8367f99ba3b70','finance ',0,0,NULL,0),('5e94654635c8367f99ba3b79','finance',0,0,NULL,0),('5e94655535c8367f99ba3b82','general',0,0,NULL,0),('5e94655b35c8367f99ba3b8b','general',0,0,NULL,0),('5e94656335c8367f99ba3b94','general',0,0,NULL,0),('5e94656a35c8367f99ba3b9d','general',0,0,NULL,0),('5e94657135c8367f99ba3ba6','general',0,0,NULL,0);
 /*!40000 ALTER TABLE `agents` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -54,7 +62,7 @@ CREATE TABLE `waitlist_finance` (
   `id` int NOT NULL AUTO_INCREMENT,
   `socket_id` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -121,4 +129,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-03-23 20:21:19
+-- Dump completed on 2020-04-13 21:28:42
