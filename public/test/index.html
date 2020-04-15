@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>AllocablTest | ESC</title>
+        <!-- Allocabl -->
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            for (let i = 0; i < 100; i++) {
+                const socket = io();
+                socket.on("loginInfo", (info) => {
+                    console.log(socket.id);
+                    console.log("loginInfo");
+                    console.log(info);
+                });
+                socket.on("waitList", (msg) => {
+                    console.log(socket.id);
+                    console.log("waitlist");
+                    console.log(msg);
+                });
+                socket.on("agentAvailable", (msg) => {
+                    console.log(socket.id);
+                    console.log("agentAvailable");
+                    console.log(msg);
+                });
+                socket.emit("loginGuest", "finance");
+            }
+        </script>
+    </head>
+    <body></body>
+</html>

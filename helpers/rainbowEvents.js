@@ -21,7 +21,8 @@ const onAgentStatusChange = async (rainbowSDK, id, presence) => {
             await databaseManager.clearDepartmentWaitlist(department);
             for (let waiting of waiters) {
                 let socket = io.sockets.connected[waiting.socket_id];
-                socket.emit("customError", "all agents have gone offline");
+                if (socket)
+                    socket.emit("customError", "all agents have gone offline");
             }
         }
     }

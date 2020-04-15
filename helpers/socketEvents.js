@@ -55,12 +55,16 @@ const checkWaitlist = async (rainbowSDK, department) => {
     if (nextInList.length != 0) {
         await databaseManager.removeFromWaitList(department);
         let socket = io.sockets.connected[nextInList[0].socket_id];
-        socket.emit(
-            "agentAvailable",
-            `An agent is now available! Connecting you to a ${department} agent...`
-        );
-        await module.exports.loginGuest(rainbowSDK, socket, department);
         await module.exports.updateClientsPositions(department);
+        if (socket) {
+            socket.emit(
+                "agentAvailable",
+                `An agent is now available! Connecting you to a ${department} agent...`
+            );
+            await module.exports.loginGuest(rainbowSDK, socket, department);
+        } else {
+            await checkWaitlist(rainbowSDK, department);
+        }
     }
 };
 
@@ -68,7 +72,7 @@ const updateClientsPositions = async (department) => {
     let rows = await databaseManager.getDepartmentWaitlist(department);
     for (var i = 0; i < rows.length; i++) {
         let socket = io.sockets.connected[rows[i].socket_id];
-        socket.emit("waitList", `Queue position: ${i + 1}`);
+        if (socket) socket.emit("waitList", `Queue position: ${i + 1}`);
     }
 };
 
