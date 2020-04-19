@@ -24,7 +24,7 @@ const initialPrompt = async botui => {
             delay: 500,
             content: "K"
         });
-        return null;
+        return [null, null];
     }
 };
 
@@ -50,22 +50,72 @@ const departmentPrompt = async botui => {
             }
         ]
     });
-    return departmentChosen(botui, res.value);
+    return agentPrompt(botui, res.value);
 };
 
-const departmentChosen = async (botui, dept) => {
+const agentPrompt = async (botui, dept) => {
+    await botui.message.add({
+        // show a message
+        delay: 300,
+        content: "Do you have any specific agent you would like to speak to?"
+    });
+    let res = await botui.action.button({
+        // show 'text' action
+        action: [
+            {
+                text: "Yes",
+                value: "yes"
+            },
+            {
+                text: "No",
+                value: "no"
+            }
+        ]
+    });
+    document.getElementsByTagName("button")[0].setAttribute("id", "yes");
+    if (res.value === "yes") {
+        return connectWithAgent(botui, dept);
+    } else {
+        return connectWithoutAgent(botui, dept)
+    }
+};
+
+const connectWithAgent = async(botui, dept) => {
+    let agent = await agentPromptName(botui);
+    await botui.message.add({
+        // show a message
+        delay: 300,
+        content: `Connecting you to agent ${agent} from ${dept} department..`
+    });
+    return [dept, agent];
+}
+
+const agentPromptName = async (botui) => {
+    let agent = await botui.action.text({
+        action: {
+            placeholder: "Enter agent name"
+        }
+    });
+    return agent.value;
+}
+
+const connectWithoutAgent = async (botui, dept) => {
     await botui.message.add({
         // show a message
         delay: 300,
         content: `Connecting you to a ${dept} agent...`
     });
-    return dept;
+    return [dept, null];
 };
 
-const connected = async botui => {
+const connected = async (botui, conversation) => {
     await botui.message.removeAll();
+    console.log(conversation);
     await botui.message.add({
         content: "You are now connected!"
+    });
+    await botui.message.add({
+        content: `Chatting with ${conversation.contact.firstname}`
     });
 };
 
