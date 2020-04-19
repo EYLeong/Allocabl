@@ -56,9 +56,9 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("loginGuest", async (department) => {
+    socket.on("loginGuest", async inputs => {
         try {
-            await synchronized.loginGuestLocked(rainbowSDK, socket, department);
+            await synchronized.loginGuestLocked(rainbowSDK, socket, inputs);
         } catch (err) {
             socket.emit("customError", "There is a problem with the server");
             console.log(err);
