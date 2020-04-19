@@ -11,7 +11,7 @@ const loginInfo = async (rainbowSDK, info) => {
         let conversation = await rainbowSDK.conversations.openConversationForContact(
             contact
         );
-        rainbowSDK.im.sendMessageToConversation(conversation, "Test");
+        rainbowSDK.im.sendMessageToConversation(conversation, "You are now connected with a client.");
         return conversation
     } else {
         console.error("null contact");
