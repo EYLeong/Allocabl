@@ -4,7 +4,7 @@ const utils = require("./utils");
 const connectionPool = mysql.createPool({
     connectionLimit: 1,
     host: "localhost",
-    user: "root",
+    user: "allocabl",
     password: "Password123",
     multipleStatements: true,
 });
