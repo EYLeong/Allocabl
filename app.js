@@ -56,7 +56,7 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("loginGuest", async inputs => {
+    socket.on("loginGuest", async (inputs) => {
         try {
             await synchronized.loginGuestLocked(rainbowSDK, socket, inputs);
         } catch (err) {

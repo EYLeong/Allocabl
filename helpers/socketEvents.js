@@ -82,7 +82,10 @@ const checkWaitlist = async (rainbowSDK, department) => {
                 "agentAvailable",
                 `An agent is now available! Connecting you to a ${department} agent...`
             );
-            await module.exports.loginGuest(rainbowSDK, socket, [department, null]);
+            await module.exports.loginGuest(rainbowSDK, socket, [
+                department,
+                null,
+            ]);
         } else {
             await checkWaitlist(rainbowSDK, department);
         }
