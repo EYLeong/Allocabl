@@ -140,9 +140,9 @@ public class SeleniumTest extends Thread {
             nextButton3.click();
             Thread.sleep(20000);
 
-            WebElement response = driver.findElement(By.xpath("/html/body/div[1]/div[1]/div/div[1]/div[6]/div/div/span"));
+            WebElement response = driver.findElement(By.xpath("/html/body/div[1]/div[1]/div/div[1]/div[8]/div/div/span"));
             System.out.println(response.getText());
-            if(response.getText().equals("no agent online")) System.out.println("General: passed");
+            if(response.getText().equals("No agent is online!")) System.out.println("General: passed");
             else System.out.println("General: failed");
 
         } catch (final Exception e) {
@@ -416,9 +416,9 @@ public class SeleniumTest extends Thread {
 
             Thread.sleep(2000);
 
-            WebElement response = driver.findElement(By.xpath("/html/body/div[1]/div[1]/div/div[1]/div[1]/div/div/span"));
+            WebElement response = driver.findElement(By.xpath("/html/body/div[1]/div[1]/div/div[1]/div[9]/div/div/span"));
             System.out.println(response.getText());
-            if(response.getText().equals("")) System.out.println("Manual Not Exist: passed");
+            if(response.getText().equals("Requested agent not found.")) System.out.println("Manual Not Exist: passed");
             else System.out.println("Manual Not Exist: failed");
 
             driver.close();
