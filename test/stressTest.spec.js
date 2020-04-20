@@ -84,7 +84,7 @@ describe("concurrency stress testing", () => {
                     "sales"
                 );
             }
-            await promiseTimeout(1100);
+            await promiseTimeout(1500);
             let rows = await promiseQuery(
                 "SELECT * FROM allocablTest.waitlist_sales"
             );

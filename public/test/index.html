@@ -8,25 +8,56 @@
         <!-- Allocabl -->
         <script src="/socket.io/socket.io.js"></script>
         <script>
+            let financeWaitlistNum = 0;
+            let financeLoginNum = 0;
+            let salesWaitlistNum = 0;
+            let salesLoginNum = 0;
             for (let i = 0; i < 100; i++) {
                 const socket = io();
                 socket.on("loginInfo", (info) => {
                     console.log(socket.id);
                     console.log("loginInfo");
                     console.log(info);
+                    financeLoginNum++;
                 });
                 socket.on("waitList", (msg) => {
                     console.log(socket.id);
                     console.log("waitlist");
                     console.log(msg);
-                });
-                socket.on("agentAvailable", (msg) => {
-                    console.log(socket.id);
-                    console.log("agentAvailable");
-                    console.log(msg);
+                    if (msg === "All agents busy! Added to waitlist!")
+                        financeWaitlistNum++;
                 });
                 socket.emit("loginGuest", "finance");
             }
+            for (let i = 0; i < 100; i++) {
+                const socket = io();
+                socket.on("loginInfo", (info) => {
+                    console.log(socket.id);
+                    console.log("loginInfo");
+                    console.log(info);
+                    salesLoginNum++;
+                });
+                socket.on("waitList", (msg) => {
+                    console.log(socket.id);
+                    console.log("waitlist");
+                    console.log(msg);
+                    if (msg === "All agents busy! Added to waitlist!")
+                        salesWaitlistNum++;
+                });
+                socket.emit("loginGuest", "sales");
+            }
+            setTimeout(() => {
+                console.log(
+                    "FINANCE " + financeLoginNum + " RECEIVED CREDENTIALS"
+                );
+                console.log("FINANCE " + financeWaitlistNum + " WAITLISTED");
+                console.log("SALES " + salesLoginNum + " RECEIVED CREDENTIALS");
+                console.log("SALES " + salesWaitlistNum + " WAITLISTED");
+                if (financeLoginNum === 5 && financeWaitlistNum === 95)
+                    console.log("FINANCE DEPT PASSED");
+                if (salesLoginNum === 1 && salesWaitlistNum === 99)
+                    console.log("SALES DEPT PASSED");
+            }, 20000);
         </script>
     </head>
     <body></body>
