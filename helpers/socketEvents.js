@@ -23,21 +23,21 @@ const loginGuest = async (rainbowSDK, socket, inputs) => {
     let department = inputs[0];
     let agent = inputs[1];
     let online = await databaseManager.checkDepartmentOnline(department);
-    if (online.length != 0) {
-        let rows=[];
-        let emitted=false;
-        if (agent!=null) {
-            let agents=await rainbowSDK.admin.getAllUsers("all");
-            let result = agents.filter(agentInfo => agentInfo.firstName == agent);
-            if (result.length!=0) rows = await databaseManager.checkAgentAvailable(department, result[0].id);
-            else {
-                emitted=true;
-                socket.emit("customError", "Requested agent not found.");
-            }
-        }
+    let emitted=false;
+    let rows=[];
+    if (agent!=null) {
+        let agents=await rainbowSDK.admin.getAllUsers("all");
+        let result = agents.filter(agentInfo => agentInfo.firstName == agent);
+        if (result.length!=0) rows = await databaseManager.checkAgentAvailable(department, result[0].id);
         else {
-            rows = await databaseManager.getAgent(department);
+            emitted=true;
+            socket.emit("customError", "Requested agent not found.");
         }
+    }
+    else {
+        rows = await databaseManager.getAgent(department);
+    }
+    if (online.length != 0 && !emitted) {
         if (rows.length != 0) {
             let result = await databaseManager.setAgentUnavailable(rows[0].id);
             result = await databaseManager.incrementCustomersServed(rows[0].id);
@@ -55,19 +55,19 @@ const loginGuest = async (rainbowSDK, socket, inputs) => {
                 agentID: rows[0].id,
             });
         } else {
-            if (!emitted) {
-                if (agent!=null) socket.emit("customError", "Requested agent is not online or available.");
-                else {
-                    await databaseManager.addWaitList(department, socket.id);
-                    let rows = await databaseManager.getDepartmentWaitlist(department);
-                    socket.emit("waitList", "All agents busy! Added to waitlist!");
-                    socket.emit("waitList", `Queue position: ${rows.length}`);
-                }
+            if (agent!=null) socket.emit("customError", "Requested agent is not online or available.");
+            else {
+                await databaseManager.addWaitList(department, socket.id);
+                let rows = await databaseManager.getDepartmentWaitlist(department);
+                socket.emit("waitList", "All agents busy! Added to waitlist!");
+                socket.emit("waitList", `Queue position: ${rows.length}`);
             }
         }
     } else {
-        if (agent!=null) socket.emit("customError", "Requested agent is not online.");
-        else socket.emit("customError", "No agent is online!");
+        if (!emitted) {
+            if (agent!=null) socket.emit("customError", "Requested agent is not online.");
+            else socket.emit("customError", "No agent is online!");
+        }
     }
 };
 
