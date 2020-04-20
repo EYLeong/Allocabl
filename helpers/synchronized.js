@@ -4,9 +4,9 @@ const AsyncLock = require("async-lock");
 const lock = new AsyncLock();
 const KEY = "key";
 
-const loginGuestLocked = async (rainbowSDK, socket, department) => {
+const loginGuestLocked = async (rainbowSDK, socket, inputs) => {
     await lock.acquire(KEY, async () => {
-        await socketEvents.loginGuest(rainbowSDK, socket, department);
+        await socketEvents.loginGuest(rainbowSDK, socket, inputs);
     });
 };
 

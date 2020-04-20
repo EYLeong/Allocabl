@@ -21,8 +21,10 @@ $(function () {
     }
 
     const reprompt = async () => {
-        let dept = await initialPrompt(botui);
-        if (dept) socket.emit("loginGuest", dept);
+        let inputs = await initialPrompt(botui);
+        if (inputs[0]!=null) {
+            socket.emit("loginGuest", inputs);
+        }
     };
 
     const forceDisconnect = async (conversation) => {
@@ -58,7 +60,7 @@ $(function () {
 
     socket.on("loginInfo", async (info) => {
         let conversation = await loginInfo(rainbowSDK, info);
-        await connected(botui);
+        await connected(botui, conversation);
         while (next) {
             let input = await textInput(botui);
             await processInput(input.value, conversation);
@@ -80,10 +82,11 @@ $(function () {
     /* Listen to the SDK event RAINBOW_ONREADY */
     document.addEventListener(rainbowSDK.RAINBOW_ONREADY, async () => {
         console.log("[DEMO] :: On Rainbow Ready!");
-        let dept = await initialPrompt(botui);
-        if (dept) {
+        //inputs[0] is department, inputs[1] is agent
+        let inputs = await initialPrompt(botui);
+        if (inputs[0]!=null) {
             socket.connect();
-            socket.emit("loginGuest", dept);
+            socket.emit("loginGuest", inputs);
         }
     });
 

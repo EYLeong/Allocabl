@@ -223,6 +223,81 @@ describe("DatabaseManager", function () {
             securityTests(databaseManager.getAgent);
         });
 
+        describe("checkAgentAvailable", () => {
+            before("insert data and set database", async () => {
+                let sql =
+                    "INSERT INTO allocablTest.agents VALUES ('1','sales',1,0,NULL,1),('2','sales',0,10,NULL,1),('3','sales',1,2,NULL,1),('4','finance',0,0,NULL,0)";
+                await promiseQuery(sql);
+                databaseManager.setDatabase("allocablTest");
+            });
+
+            after("clear table", async () => {
+                await promiseQuery(
+                    "SET SQL_SAFE_UPDATES = 0;DELETE FROM allocablTest.agents;SET SQL_SAFE_UPDATES = 1"
+                );
+            });
+
+            it("returns specified agent that is available", async function () {
+                let rows = await databaseManager.checkAgentAvailable("sales", "3");
+                expect(rows).to.have.lengthOf(1);
+                expect(rows[0].id).to.equal("3");
+            });
+
+            it("is empty when specified agent is not available", async () => {
+                let rows = await databaseManager.checkAgentAvailable("sales", "2");
+                expect(rows).to.have.lengthOf(0);
+            });
+
+            it("is empty when specified agent does not exist", async () => {
+                let rows = await databaseManager.checkAgentAvailable("sales", "4");
+                expect(rows).to.have.lengthOf(0);
+            });
+
+            it("is protected against sql injection", async () => {
+                let result = await databaseManager.addSocketAgent(
+                    "'; DROP allocablTest.agents",
+                    "'; DROP allocablTest.agents"
+                );
+                expect(result).to.have.property("affectedRows", 0);
+                expect(result).to.have.property("changedRows", 0);
+            });
+
+            it("throws an error if the database name is wrong", async () => {
+                databaseManager.setDatabase("invalid");
+                try {
+                    await databaseManager.addSocketAgent("asdf", "test");
+                } catch (err) {
+                    expect(err).to.have.property(
+                        "sqlMessage",
+                        "Unknown database 'invalid'"
+                    );
+                }
+                databaseManager.setDatabase("allocablTest");
+            });
+
+            it("throws an error if the parameters are not strings", async () => {
+                try {
+                    await databaseManager.addSocketAgent(
+                        { test: "test" },
+                        "string"
+                    );
+                } catch (err) {
+                    expect(err.message).to.be.equal(
+                        "parameters must be of type string"
+                    );
+                }
+                try {
+                    await databaseManager.addSocketAgent("string", {
+                        test: "test",
+                    });
+                } catch (err) {
+                    expect(err.message).to.be.equal(
+                        "parameters must be of type string"
+                    );
+                }
+            });
+        });
+
         describe("getAgentDepartment", () => {
             before("insert data and set database", async () => {
                 let sql =

@@ -17,6 +17,22 @@ const setDatabase = (dbName) => {
     databaseName = dbName;
 };
 
+function checkAgentAvailable(department, agentID) {
+    if (typeof agentID !== "string" || typeof department !== "string")
+        return new Promise((resolve, reject) => {
+            reject(new Error("parameters must be of type string"));
+        });
+    let sql = `SELECT id FROM ${databaseName}.agents WHERE available = 1 AND department = ? AND id = ?`;
+    let inserts = [department, agentID];
+    sql = mysql.format(sql, inserts);
+    return new Promise(function (resolve, reject) {
+        connectionPool.query(sql, function (err, rows) {
+            if (err) reject(err);
+            resolve(rows);
+        });
+    });
+}
+
 function getAgent(department) {
     if (typeof department !== "string")
         return new Promise((resolve, reject) => {
@@ -178,6 +194,7 @@ const setAgentOffline = (agentID) => {
 };
 
 const checkDepartmentOnline = (department) => {
+    console.log(department);
     if (typeof department !== "string")
         return new Promise((resolve, reject) => {
             reject(new Error("parameters must be of type string"));
@@ -319,6 +336,7 @@ const findSocketWaitlistDepartment = async (socketID) => {
 
 module.exports = {
     getAgent,
+    checkAgentAvailable,
     incrementCustomersServed,
     addSocketAgent,
     removeSocketAgent,
