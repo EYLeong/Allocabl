@@ -194,7 +194,6 @@ const setAgentOffline = (agentID) => {
 };
 
 const checkDepartmentOnline = (department) => {
-    console.log(department);
     if (typeof department !== "string")
         return new Promise((resolve, reject) => {
             reject(new Error("parameters must be of type string"));

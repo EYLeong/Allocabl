@@ -27,7 +27,7 @@
                     if (msg === "All agents busy! Added to waitlist!")
                         financeWaitlistNum++;
                 });
-                socket.emit("loginGuest", "finance");
+                socket.emit("loginGuest", ["finance", null]);
             }
             for (let i = 0; i < 100; i++) {
                 const socket = io();
@@ -44,7 +44,7 @@
                     if (msg === "All agents busy! Added to waitlist!")
                         salesWaitlistNum++;
                 });
-                socket.emit("loginGuest", "sales");
+                socket.emit("loginGuest", ["sales", null]);
             }
             setTimeout(() => {
                 console.log(

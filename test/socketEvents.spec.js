@@ -83,7 +83,10 @@ describe("SocketEvents", () => {
             };
 
             it("picks the correct agent and sends the right data to the socket", async () => {
-                await socketEvents.loginGuest(testSDK, fakeSocket, "sales");
+                await socketEvents.loginGuest(testSDK, fakeSocket, [
+                    "sales",
+                    null,
+                ]);
                 expect(loginInfoSignal).to.be.equal(1);
                 expect(loginInfoData).to.be.equal(1);
             });
@@ -118,7 +121,10 @@ describe("SocketEvents", () => {
             };
 
             it("sends the correct waitlist messages to the socket", async () => {
-                await socketEvents.loginGuest(testSDK, fakeSocket, "general");
+                await socketEvents.loginGuest(testSDK, fakeSocket, [
+                    "general",
+                    null,
+                ]);
                 expect(busyMsg).to.be.equal(1);
                 expect(queuePos).to.be.equal(1);
                 expect(waitlistSignal).to.be.equal(2);
@@ -140,12 +146,15 @@ describe("SocketEvents", () => {
                 id: "testSocketID",
                 emit: (signal, data) => {
                     if (signal === "customError") errorSignal++;
-                    if (data === "no agent online") errorData++;
+                    if (data === "No agent is online!") errorData++;
                 },
             };
 
             it("sends the correct messages to the socket", async () => {
-                await socketEvents.loginGuest(testSDK, fakeSocket, "finance");
+                await socketEvents.loginGuest(testSDK, fakeSocket, [
+                    "finance",
+                    null,
+                ]);
                 expect(errorSignal).to.be.equal(1);
                 expect(errorData).to.be.equal(1);
             });
@@ -243,12 +252,13 @@ describe("SocketEvents", () => {
             let loginGuestSDK = 0;
             let loginGuestSocket = 0;
             let loginGuestDepartment = 0;
-            const fakeLoginGuest = (rainbowSDK, socket, department) => {
+            const fakeLoginGuest = (rainbowSDK, socket, inputs) => {
                 if (JSON.stringify(rainbowSDK) === JSON.stringify(testSDK))
                     loginGuestSDK++;
                 if (JSON.stringify(socket) === JSON.stringify(fakeSocket))
                     loginGuestSocket++;
-                if (department === "sales") loginGuestDepartment++;
+                if (JSON.stringify(inputs) === JSON.stringify(["sales", null]))
+                    loginGuestDepartment++;
             };
 
             let updatePosDepartment = 0;
